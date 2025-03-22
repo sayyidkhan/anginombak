@@ -1,0 +1,43 @@
+/* Enhanced Slider Styling */
+
+/* Enhance the slider track */
+.p-slider .p-slider-range {
+  background: #6366f1 !important;
+  height: 8px !important;
+}
+
+/* Style the base track */
+.p-slider {
+  background: #e5e7eb !important;
+  height: 8px !important;
+  border-radius: 4px !important;
+}
+
+/* Make the handle more visible */
+.p-slider .p-slider-handle {
+  background: #ffffff !important;
+  border: 3px solid #6366f1 !important;
+  width: 22px !important;
+  height: 22px !important;
+  margin-top: -7px !important;
+  margin-left: -11px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+  cursor: grab !important;
+}
+
+/* Handle hover state */
+.p-slider .p-slider-handle:hover {
+  background: #f8fafc !important;
+  border: 3px solid #4f46e5 !important;
+  transform: scale(1.1) !important;
+}
+
+/* Handle active state */
+.p-slider .p-slider-handle:active {
+  cursor: grabbing !important;
+}
+
+/* Container for better spacing */
+.custom-slider-container {
+  padding: 10px 0;
+}

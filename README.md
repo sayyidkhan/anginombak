@@ -52,3 +52,39 @@ export default tseslint.config({
   },
 })
 ```
+
+## AnginOmbak Application
+
+AnginOmbak is a location-based application that helps users find and select locations on a map.
+
+### Features
+
+- Interactive map using Leaflet
+- Multiple ways to select a location:
+  - Click directly on the map
+  - Use current location with browser geolocation
+  - Search by location name or postal code
+- Location suggestions with Google Places API
+- Support for Singapore postal codes with district mapping
+
+### Google Places API Integration
+
+The application uses Google Places API for location search and suggestions. To use this feature:
+
+1. Get a Google Maps API key from the [Google Cloud Console](https://console.cloud.google.com/)
+2. Enable the following APIs in your Google Cloud project:
+   - Maps JavaScript API
+   - Places API
+   - Geocoding API
+3. Add your API key to the `.env` file:
+   ```
+   VITE_GOOGLE_MAPS_API_KEY=YOUR_ACTUAL_API_KEY
+   ```
+4. Restart the development server
+
+The application will use Google Places API for:
+- Location search suggestions as you type
+- Detailed place information when a suggestion is selected
+- Reverse geocoding when clicking on the map
+
+If the Google Maps API is not available, the application will fall back to OpenStreetMap's Nominatim service.
