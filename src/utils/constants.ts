@@ -12,6 +12,8 @@ export const PAGE_TITLES: { [key: string]: string } = {
   LOGIN: 'Sign in',
   PAGE_TITLE: 'Adventure Setup',
   REGISTER: 'Create Account',
+  EXPLORE: 'Explore Adventures',
+  RESPONSE_TITLE: 'Your Adventure',
 };
 
 // Checkpoint titles
@@ -56,6 +58,11 @@ export const BUTTON_LABELS: { [key: string]: string } = {
   NEXT: 'Next',
   CONTINUE: 'Continue',
   FINISH: 'Finish',
+  CREATE_NEW: 'Create New',
+  JOIN_ADVENTURE: 'Join Adventure',
+  GET_STARTED: 'Get Started',
+  START: 'Start Adventure',
+  REGENERATE: 'Re-generate',
 };
 
 // Placeholders
@@ -77,4 +84,3 @@ export const PLAYER2_SUGGESTIONS: { [key: string]: string } = {
   VISIT_BEACH: "I want to learn more about the ocean, so I went to the beach. I collected seashells, built sandcastles, and discovered how waves shape the shore. My dad explained why some shells are smooth while others are rough, making me see the beach as more than just a fun place—it’s full of science and history.",
   VISIT_HOTSPRINGS: "I want to see a hot spring, so we visited one during a road trip. As I soaked in the warm water, I learned how the Earth’s heat creates these natural wonders. The experience made me curious about geology and how nature works beneath the surface."
 };
-

@@ -64,8 +64,15 @@ const Login = () => {
             onClick={() => {
               if (username.trim()) {
                 console.log('Login attempt with:', { username, rememberMe });
-                // Pass username as a URL parameter
-                navigate(`/prompt?username=${encodeURIComponent(username)}`);
+                
+                // Store username in localStorage if rememberMe is checked
+                if (rememberMe) {
+                  localStorage.setItem('anginombak_username', username);
+                  console.log('Username saved to localStorage');
+                }
+                
+                // Navigate to the explore page instead of prompt
+                navigate('/explore');
               }
             }}
           />
