@@ -88,3 +88,75 @@ The application will use Google Places API for:
 - Reverse geocoding when clicking on the map
 
 If the Google Maps API is not available, the application will fall back to OpenStreetMap's Nominatim service.
+
+## Deployment on Vercel
+
+This application is configured for seamless deployment on Vercel. Follow these steps to deploy:
+
+### Option 1: Deploy from the Vercel Dashboard
+
+1. Push your code to a GitHub, GitLab, or Bitbucket repository
+2. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+3. Click "Add New" > "Project"
+4. Import your repository
+5. Configure the project:
+   - Framework Preset: Vite
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+   - Install Command: `npm install`
+6. Add environment variables (if needed):
+   - Add your `VITE_GOOGLE_MAPS_API_KEY` if you're using Google Maps
+7. Click "Deploy"
+
+### Option 2: Deploy using Vercel CLI
+
+1. Install Vercel CLI:
+   ```bash
+   npm install -g vercel
+   ```
+
+2. Login to Vercel:
+   ```bash
+   vercel login
+   ```
+
+3. Deploy from your project directory:
+   ```bash
+   cd /path/to/anginombak
+   vercel
+   ```
+
+4. Follow the prompts to configure your deployment
+5. For production deployment:
+   ```bash
+   vercel --prod
+   ```
+
+### Environment Variables on Vercel
+
+If your application uses environment variables:
+
+1. Go to your project in the Vercel dashboard
+2. Navigate to "Settings" > "Environment Variables"
+3. Add your environment variables (e.g., `VITE_GOOGLE_MAPS_API_KEY`)
+4. Redeploy your application for the changes to take effect
+
+### CORS Configuration
+
+This application includes CORS handling for external API requests:
+
+1. **Development Environment**: The Vite development server includes a proxy configuration in `vite.config.ts` that handles CORS for OpenStreetMap Nominatim API requests.
+
+2. **Production Environment**: The Vercel deployment includes:
+   - CORS headers in `vercel.json` for all routes
+   - A serverless API proxy function in `/api/proxy.js` that handles requests to external APIs
+   - URL rewriting in `vercel.json` to route API requests through the proxy
+
+This configuration ensures that all external API requests work correctly in both development and production environments.
+
+### Troubleshooting Deployment Issues
+
+- **404 errors on page refresh**: This is handled by the `vercel.json` configuration which includes proper rewrites for SPA routing
+- **Environment variables not working**: Make sure they are prefixed with `VITE_` for client-side access
+- **Build failures**: Check the build logs in Vercel dashboard for specific errors
+- **CORS errors**: If you encounter CORS issues with external APIs, check the proxy configuration in `api/proxy.js` and `vercel.json`

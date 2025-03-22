@@ -184,7 +184,7 @@ const LocationMap = ({ onLocationSelect, selectedLocation }: LocationMapProps) =
       
       // Fallback to OpenStreetMap if Google Maps is not loaded
       const nominatimResponse = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+        `/nominatim/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
         { headers: { 'Accept-Language': 'en' } }
       );
       const nominatimData = await nominatimResponse.json();
@@ -518,7 +518,7 @@ const LocationMap = ({ onLocationSelect, selectedLocation }: LocationMapProps) =
         } else {
           // Fallback to OpenStreetMap if Google Maps is not loaded
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${cleanPostalCode},Singapore&limit=1`,
+            `/nominatim/search?format=json&q=${cleanPostalCode},Singapore&limit=1`,
             { headers: { 'Accept-Language': 'en' } }
           );
           
@@ -597,7 +597,7 @@ const LocationMap = ({ onLocationSelect, selectedLocation }: LocationMapProps) =
       } else {
         // Fallback to OpenStreetMap if Google Maps is not loaded
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchTerm)}&limit=1`,
+          `/nominatim/search?format=json&q=${encodeURIComponent(searchTerm)}&limit=1`,
           { headers: { 'Accept-Language': 'en' } }
         );
         

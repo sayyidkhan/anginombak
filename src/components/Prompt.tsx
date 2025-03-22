@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Slider } from 'primereact/slider';
 import LocationMap from './LocationMap';
 import { 
@@ -11,7 +11,9 @@ import {
   BUTTON_LABELS, 
   PLACEHOLDERS,
   CHECKPOINT_TITLES,
-  MOBILE_CHECKPOINT_TITLES
+  MOBILE_CHECKPOINT_TITLES,
+  PLAYER1_SUGGESTIONS,
+  PLAYER2_SUGGESTIONS
 } from '../utils/constants';
 import './slider-styles.css';
 
@@ -34,6 +36,19 @@ const Prompt = () => {
   const [isPublic, setIsPublic] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [username, setUsername] = useState('');
+  
+  // Get username from URL
+  const location = useLocation();
+  
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const usernameParam = queryParams.get('username');
+    if (usernameParam) {
+      setUsername(usernameParam);
+      console.log('Username retrieved from URL:', usernameParam);
+    }
+  }, [location]);
 
   // Check if the device is mobile
   useEffect(() => {
@@ -143,6 +158,26 @@ const Prompt = () => {
               autoFocus
               rows={5}
             />
+            <div className="flex flex-wrap gap-2 mt-1">
+              <button 
+                className="text-sm text-indigo-600 hover:text-indigo-800 rounded-full px-4 py-1 bg-transparent border border-indigo-600 hover:border-indigo-800"
+                onClick={() => setPlayer1(PLAYER1_SUGGESTIONS.SAVING)}
+              >
+                Saving
+              </button>
+              <button 
+                className="text-sm text-indigo-600 hover:text-indigo-800 rounded-full px-4 py-1 bg-transparent border border-indigo-600 hover:border-indigo-800"
+                onClick={() => setPlayer1(PLAYER1_SUGGESTIONS.INVESTING)}
+              >
+                Investing
+              </button>
+              <button 
+                className="text-sm text-indigo-600 hover:text-indigo-800 rounded-full px-4 py-1 bg-transparent border border-indigo-600 hover:border-indigo-800"
+                onClick={() => setPlayer1(PLAYER1_SUGGESTIONS.BUDGETING)}
+              >
+                Budgeting
+              </button>
+            </div>
           </div>
         );
       
@@ -159,6 +194,26 @@ const Prompt = () => {
               autoFocus
               rows={5}
             />
+            <div className="flex flex-wrap gap-2 mt-1">
+              <button 
+                className="text-sm text-indigo-600 hover:text-indigo-800 rounded-full px-4 py-1 bg-transparent border border-indigo-600 hover:border-indigo-800"
+                onClick={() => setPlayer2(PLAYER2_SUGGESTIONS.VISIT_PARK)}
+              >
+                Visit Park
+              </button>
+              <button 
+                className="text-sm text-indigo-600 hover:text-indigo-800 rounded-full px-4 py-1 bg-transparent border border-indigo-600 hover:border-indigo-800"
+                onClick={() => setPlayer2(PLAYER2_SUGGESTIONS.VISIT_BEACH)}
+              >
+                Visit Beach
+              </button>
+              <button 
+                className="text-sm text-indigo-600 hover:text-indigo-800 rounded-full px-4 py-1 bg-transparent border border-indigo-600 hover:border-indigo-800"
+                onClick={() => setPlayer2(PLAYER2_SUGGESTIONS.VISIT_HOTSPRINGS)}
+              >
+                Visit Hotsprings
+              </button>
+            </div>
           </div>
         );
       
@@ -328,6 +383,7 @@ const Prompt = () => {
         <div className="flex flex-col items-center mb-6">
           <h2 className="text-xl font-bold text-indigo-600 mb-2">{APP_NAME}</h2>
           <h1 className="text-2xl text-gray-600 font-medium text-center">{PAGE_TITLES.PAGE_TITLE}</h1>
+          <p className="text-lg text-gray-500">Welcome back, {username} !</p>
         </div>
         
         {/* Progress steps */}

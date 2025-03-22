@@ -17,15 +17,6 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (username.trim()) {
-      console.log('Login attempt with:', { username, rememberMe });
-      // Navigate to the prompt page after login
-      navigate('/prompt');
-    }
-  };
-
   return (
     <div className="flex justify-center items-center min-h-screen bg-blue-50">
       <div className="bg-white rounded-3xl shadow-lg p-8 w-full max-w-md mx-4">
@@ -35,7 +26,7 @@ const Login = () => {
           <h1 className="text-2xl text-gray-600 font-medium text-center">{PAGE_TITLES.LOGIN}</h1>
         </div>
         
-        <form onSubmit={handleLogin} className="flex flex-col gap-6">
+        <form className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <label htmlFor="username" className="text-gray-700 font-medium">{FORM_LABELS.USERNAME}</label>
             <InputText
@@ -66,10 +57,17 @@ const Login = () => {
           </div>
           
           <Button
-            type="submit"
+            type="button"
             label={BUTTON_LABELS.SIGN_IN}
             className="p-3 text-white bg-indigo-500 hover:bg-indigo-600 border-none rounded-lg"
             disabled={!username.trim()}
+            onClick={() => {
+              if (username.trim()) {
+                console.log('Login attempt with:', { username, rememberMe });
+                // Pass username as a URL parameter
+                navigate(`/prompt?username=${encodeURIComponent(username)}`);
+              }
+            }}
           />
           
           <div className="text-center">
