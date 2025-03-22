@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Slider } from 'primereact/slider';
 import LocationMap from '../common/LocationMap';
+import Header from '../common/Header';
+import Footer from '../common/Footer';
 import { 
-  APP_NAME, 
   PAGE_TITLES, 
   FORM_LABELS, 
   BUTTON_LABELS, 
@@ -36,7 +37,6 @@ const Prompt = () => {
   const [isPublic, setIsPublic] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  const [username, setUsername] = useState('');
   
   // Get username from URL
   const location = useLocation();
@@ -46,8 +46,24 @@ const Prompt = () => {
     const queryParams = new URLSearchParams(location.search);
     const usernameParam = queryParams.get('username');
     if (usernameParam) {
-      setUsername(usernameParam);
       console.log('Username retrieved from URL:', usernameParam);
+      
+      // Try to load saved form data from localStorage
+      try {
+        const savedFormData = localStorage.getItem(`anginombak_formData_${usernameParam}`);
+        if (savedFormData) {
+          const parsedData = JSON.parse(savedFormData);
+          setPlayer1(parsedData.player1 || '');
+          setPlayer2(parsedData.player2 || '');
+          setStartLocation(parsedData.startLocation || null);
+          setCheckpoints(parsedData.checkpoints || 4);
+          setDuration(parsedData.duration || 30);
+          setIsPublic(parsedData.isPublic || false);
+          console.log('Loaded saved form data for user:', usernameParam);
+        }
+      } catch (error) {
+        console.error('Error loading saved form data:', error);
+      }
     }
   }, [location]);
 
@@ -73,6 +89,22 @@ const Prompt = () => {
     if (currentStep < STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
+      // Save form data to localStorage if username exists
+      try {
+        const formData = {
+          player1,
+          player2,
+          startLocation,
+          checkpoints,
+          duration,
+          isPublic
+        };
+        localStorage.setItem(`anginombak_formData_${location.search.split('username=')[1]}`, JSON.stringify(formData));
+        console.log('Form data saved to localStorage for user:', location.search.split('username=')[1]);
+      } catch (error) {
+        console.error('Error saving form data:', error);
+      }
+      
       // Final submission
       console.log('Form submitted:', { 
         player1, 
@@ -91,7 +123,7 @@ const Prompt = () => {
           checkpoints, 
           duration,
           isPublic,
-          username 
+          username: location.search.split('username=')[1] 
         } 
       });
     }
@@ -170,6 +202,7 @@ const Prompt = () => {
               autoFocus
               rows={5}
             />
+            <div className="mt-2 mb-1 text-sm text-gray-600 font-medium text-left">Suggested prompts:</div>
             <div className="flex flex-wrap gap-2 mt-1">
               <button 
                 className="text-sm text-indigo-600 hover:text-indigo-800 rounded-full px-4 py-1 bg-transparent border border-indigo-600 hover:border-indigo-800"
@@ -206,6 +239,7 @@ const Prompt = () => {
               autoFocus
               rows={5}
             />
+            <div className="mt-2 mb-1 text-sm text-gray-600 font-medium text-left">Suggested prompts:</div>
             <div className="flex flex-wrap gap-2 mt-1">
               <button 
                 className="text-sm text-indigo-600 hover:text-indigo-800 rounded-full px-4 py-1 bg-transparent border border-indigo-600 hover:border-indigo-800"
@@ -248,7 +282,7 @@ const Prompt = () => {
           <div className="flex flex-col gap-4">
             <label className="text-gray-700 font-medium">{FORM_LABELS.CHECKPOINTS}</label>
             <div className="flex gap-4 justify-center">
-              {[4, 5, 6].map((num) => (
+              {[2, 3, 4].map((num) => (
                 <button
                   key={num}
                   type="button"
@@ -349,87 +383,61 @@ const Prompt = () => {
     }
   };
 
-  // Render progress indicators
-  const renderProgressSteps = () => {
-    return (
-      <div className="flex mb-8 relative w-full overflow-x-auto pb-4">
-        {/* Progress line */}
-        <div className="absolute top-4 left-0 right-0 h-1 bg-gray-200 -z-10"></div>
-        
-        {/* Container for evenly spaced steps */}
-        <div className="grid grid-cols-6 w-full gap-1">
-          {STEPS.map((step, index) => (
-            <div 
-              key={step} 
-              className="flex flex-col items-center cursor-pointer px-1"
-              onClick={() => setCurrentStep(index)}
-            >
-              {/* Circle indicator */}
-              <div 
-                className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center mb-1 md:mb-2
-                  ${index <= currentStep 
-                    ? 'bg-indigo-500 text-white' 
-                    : 'bg-gray-200 text-gray-600'
-                  }
-                  ${index < currentStep ? 'ring-2 ring-indigo-300' : ''}
-                `}
-              >
-                {index + 1}
-              </div>
-              
-              {/* Step label */}
-              <span className={`text-[10px] md:text-xs text-center ${index <= currentStep ? 'text-indigo-600 font-medium' : 'text-gray-500'}`}>
-                {isMobile ? MOBILE_CHECKPOINT_TITLES[step] : CHECKPOINT_TITLES[step]}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <div className="flex justify-center items-center min-h-screen bg-blue-50">
-      <div className="bg-white rounded-3xl shadow-lg p-4 sm:p-8 w-full max-w-2xl mx-4 sm:m-8">
-        {/* Header */}
-        <div className="flex flex-col items-center mb-6">
-          <h2 className="text-xl font-bold text-indigo-600 mb-2">{APP_NAME}</h2>
-          <h1 className="text-2xl text-gray-600 font-medium text-center">{PAGE_TITLES.PAGE_TITLE}</h1>
-          <p className="text-lg text-gray-500">Welcome back, {username} !</p>
-        </div>
-        
-        {/* Progress steps */}
-        {renderProgressSteps()}
-
-        {/* Main Content */}
-        <div className="min-h-[200px] flex items-center justify-center w-full">
-          {renderStepContent()}
-        </div>
-
-        {/* Navigation Buttons */}
-        <div className="flex justify-between mt-8">
-          {currentStep > 0 ? (
-            <Button
-              type="button"
-              label={BUTTON_LABELS.BACK}
-              onClick={handleBack}
-              className="px-6 py-2 bg-gray-200 text-gray-800 border-none rounded-lg"
-            />
-          ) : (
-            <Link to="/login" className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg flex items-center justify-center">
-              {BUTTON_LABELS.BACK}
-            </Link>
-          )}
+    <div className="min-h-screen bg-blue-50 flex flex-col">
+      <Header pageTitle={PAGE_TITLES.PAGE_TITLE} />
+      
+      <main className="flex-grow container mx-auto px-4 py-8">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-800">{PAGE_TITLES.PAGE_TITLE}</h1>
+            <div className="text-sm text-gray-500">
+              Step {currentStep + 1} of {STEPS.length}
+            </div>
+          </div>
           
-          <Button
-            type="button"
-            label={getButtonLabel()}
-            onClick={handleNext}
-            disabled={!isStepValid()}
-            className="px-6 py-2 text-white bg-indigo-500 hover:bg-indigo-600 border-none rounded-lg"
-          />
+          {/* Progress bar */}
+          <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+            <div 
+              className="bg-indigo-500 h-2.5 rounded-full" 
+              style={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
+            ></div>
+          </div>
+          
+          {/* Step title */}
+          <h2 className="text-xl font-semibold text-gray-700 mb-4">
+            {isMobile 
+              ? MOBILE_CHECKPOINT_TITLES[STEPS[currentStep]] 
+              : CHECKPOINT_TITLES[STEPS[currentStep]]}
+          </h2>
+          
+          {/* Step content */}
+          <div className="mb-8">
+            {renderStepContent()}
+          </div>
+          
+          {/* Navigation buttons */}
+          <div className="flex justify-between">
+            <Button 
+              label={BUTTON_LABELS.BACK}
+              icon="pi pi-chevron-left"
+              onClick={handleBack}
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 border-none"
+              disabled={currentStep === 0}
+            />
+            <Button 
+              label={getButtonLabel()}
+              icon="pi pi-chevron-right"
+              iconPos="right"
+              onClick={handleNext}
+              disabled={!isStepValid()}
+              className="bg-indigo-500 hover:bg-indigo-600 border-none text-white"
+            />
+          </div>
         </div>
-      </div>
+      </main>
+      
+      <Footer />
     </div>
   );
 };
