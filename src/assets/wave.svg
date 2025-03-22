@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800px" height="200px" viewBox="0 0 800 200" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M0,100 C100,30 200,170 300,100 C400,30 500,170 600,100 C700,30 800,170 800,100 L800,200 L0,200 L0,100 Z" fill="#3B82F6"></path>
+        <path d="M0,130 C100,60 200,200 300,130 C400,60 500,200 600,130 C700,60 800,200 800,130 L800,200 L0,200 L0,130 Z" fill="#2563EB"></path>
+        <path d="M0,160 C100,90 200,230 300,160 C400,90 500,230 600,160 C700,90 800,230 800,160 L800,200 L0,200 L0,160 Z" fill="#1D4ED8"></path>
+    </g>
+</svg>
