@@ -8,6 +8,7 @@ import Services from './components/Services'
 import Prompt from './components/pages/Prompt'
 import './App.css'
 import Login from './components/pages/Login'
+import Home from './components/pages/Home'
 import Explore from './components/pages/Explore'
 
 function App() {
@@ -29,7 +30,7 @@ function App() {
     
     if (savedUsername) {
       // If username exists in localStorage, redirect to explore page
-      return <Navigate to="/explore" replace />;
+      return <Navigate to="/home" replace />;
     } else {
       // Otherwise, redirect to login page
       return <Navigate to="/login" replace />;
@@ -45,6 +46,7 @@ function App() {
         <Route path="/services" element={<Services />} />
         <Route path="/main" element={<MainPage />} />
         <Route path="/prompt" element={<Prompt />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/" element={<HomeRedirect />} />
       </Routes>

@@ -100,18 +100,20 @@ const PromptResponse: React.FC = () => {
     return promptData.startLocation.name || `Location (${promptData.startLocation.lat.toFixed(4)}, ${promptData.startLocation.lng.toFixed(4)})`;
   };
   
-  // Calculate estimated time based on transport mode and checkpoint index
-  const getEstimatedTime = (checkpointIndex: number) => {
-    // Base time increases with each checkpoint (more distance)
-    const baseTime = 15 + Math.floor(Math.random() * 10) + (checkpointIndex * 5);
+  // Calculate estimated time based on transport mode
+  const getEstimatedTime = () => {
+    if (!promptData) return 0;
+    
+    // Calculate time per checkpoint by dividing total duration by number of checkpoints
+    const timePerCheckpoint = Math.floor(promptData.duration / promptData?.checkpoints);
     
     // Adjust time based on transport mode
     if (transportMode === 'Public') {
       // Public transport takes longer
-      return Math.floor(baseTime * 1.5);
+      return Math.floor(timePerCheckpoint * 1.5);
     } else {
       // Private transport is faster
-      return baseTime;
+      return timePerCheckpoint;
     }
   };
   
@@ -217,16 +219,16 @@ const PromptResponse: React.FC = () => {
                 Congratulations! You've reached your final destination.
               </p>
               <div className="mt-4 bg-green-50 p-4 rounded-lg">
-                <div className="flex items-center">
+                <div className="flex items-center justify-center">
                   <i className="pi pi-check-circle text-green-500 text-xl mr-2"></i>
-                  <h4 className="text-green-700 font-medium">Adventure Complete!</h4>
+                  <h4 className="text-green-700 font-medium text-center">Adventure Created!</h4>
                 </div>
-                <p className="text-green-600 mt-2">
+                <p className="text-green-600 mt-2 text-center">
                   You've successfully completed all checkpoints and reached your destination. 
                   Well done on completing this adventure!
                 </p>
                 {promptData && (
-                  <div className="mt-3 text-sm text-green-700">
+                  <div className="mt-3 text-sm text-green-700 text-center">
                     <p>You've experienced an amazing journey focused on {promptData.player1} and {promptData.player2}.</p>
                     <p className="mt-1">Total journey time: approximately {promptData.duration} minutes.</p>
                   </div>
@@ -240,7 +242,7 @@ const PromptResponse: React.FC = () => {
             <div>
               <h3 className="text-lg font-medium text-gray-800 mb-2">Checkpoint {activeStep}</h3>
               <p className="text-gray-700">
-                Estimated time to reach: {getEstimatedTime(activeStep)} minutes
+                Estimated time to reach: {getEstimatedTime()} minutes
               </p>
               <p className="text-sm text-gray-500 mt-2">
                 Complete the challenges at this checkpoint to continue your journey.

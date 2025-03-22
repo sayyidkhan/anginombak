@@ -1,323 +1,411 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from 'primereact/button';
-import { useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ProgressBar } from 'primereact/progressbar';
+import { Timeline } from 'primereact/timeline';
+import { Card } from 'primereact/card';
+import Header from '../common/Header';
+import Footer from '../common/Footer';
 import { 
-  APP_NAME, 
-  BUTTON_LABELS,
-  APP_DESCRIPTION
+  PAGE_TITLES
 } from '../../utils/constants';
-import windsurfIcon from '../../assets/windsurf.svg';
+
+interface CheckpointData {
+  id: number;
+  title: string;
+  description: string;
+  completed: boolean;
+  timestamp: string;
+  location: string;
+}
+
+interface AdventureData {
+  id: string;
+  title: string;
+  theme: string;
+  startLocation: {
+    lat: number;
+    lng: number;
+    name: string;
+  };
+  checkpoints: CheckpointData[];
+  transportMode: 'Public' | 'Private';
+  startTime: string;
+  estimatedDuration: number;
+  progress: number;
+}
 
 const Explore: React.FC = () => {
-  const [username, setUsername] = useState<string | null>(null);
-  const [adventureIdea] = useState('');
-  const [savedAdventures, setSavedAdventures] = useState<any[]>([]);
-  const [trendingAdventures, setTrendingAdventures] = useState<any[]>([]);
+  const [adventure, setAdventure] = useState<AdventureData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeCheckpoint, setActiveCheckpoint] = useState<number | null>(null);
+  const [timeElapsed, setTimeElapsed] = useState<number>(0);
   
+  const location = useLocation();
   const navigate = useNavigate();
   
+  // Load adventure data
   useEffect(() => {
-    // Get username from localStorage
-    const storedUsername = localStorage.getItem('anginombak_username');
-    setUsername(storedUsername);
+    const loadAdventure = async () => {
+      try {
+        // In a real app, you would fetch this data from an API
+        // For now, we'll simulate loading data from localStorage
+        const queryParams = new URLSearchParams(location.search);
+        const adventureId = queryParams.get('id');
+        
+        if (!adventureId) {
+          console.error('No adventure ID provided');
+          navigate('/home');
+          return;
+        }
+        
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Mock data for the current adventure
+        const mockAdventure: AdventureData = {
+          id: adventureId,
+          title: 'Financial Adventure in the City',
+          theme: 'Financial Literacy',
+          startLocation: {
+            lat: 1.3521,
+            lng: 103.8198,
+            name: 'Singapore Downtown'
+          },
+          checkpoints: [
+            {
+              id: 1,
+              title: 'Starting Point',
+              description: 'Begin your adventure here. Learn about financial planning basics.',
+              completed: true,
+              timestamp: new Date(Date.now() - 45 * 60000).toISOString(), // 45 minutes ago
+              location: 'Financial District'
+            },
+            {
+              id: 2,
+              title: 'Checkpoint 1',
+              description: 'Visit the bank to understand savings accounts and interest rates.',
+              completed: true,
+              timestamp: new Date(Date.now() - 30 * 60000).toISOString(), // 30 minutes ago
+              location: 'Local Bank Branch'
+            },
+            {
+              id: 3,
+              title: 'Checkpoint 2',
+              description: 'Explore the park while learning about investment options.',
+              completed: false,
+              timestamp: '',
+              location: 'Central Park'
+            },
+            {
+              id: 4,
+              title: 'Final Destination',
+              description: 'Complete your financial literacy journey at the community center.',
+              completed: false,
+              timestamp: '',
+              location: 'Community Center'
+            }
+          ],
+          transportMode: 'Public',
+          startTime: new Date(Date.now() - 60 * 60000).toISOString(), // 1 hour ago
+          estimatedDuration: 120, // 2 hours
+          progress: 50 // 50% complete
+        };
+        
+        setAdventure(mockAdventure);
+        
+        // Set active checkpoint to the first incomplete one
+        const activeIndex = mockAdventure.checkpoints.findIndex(cp => !cp.completed);
+        setActiveCheckpoint(activeIndex !== -1 ? activeIndex : mockAdventure.checkpoints.length - 1);
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading adventure:', error);
+        setLoading(false);
+      }
+    };
     
-    // Simulate loading adventures
-    setTimeout(() => {
-      // Mock data for saved adventures - in a real app, this would come from an API
-      const mockSavedAdventures = storedUsername ? [
-        {
-          id: 'saved-1',
-          title: 'Family Beach Day',
-          location: 'East Coast Park',
-          checkpoints: 3,
-          lastPlayed: '2 days ago',
-          progress: 67,
-          isPublic: false
-        },
-        {
-          id: 'saved-2',
-          title: 'City Exploration',
-          location: 'Downtown Core',
-          checkpoints: 5,
-          lastPlayed: '1 week ago',
-          progress: 40,
-          isPublic: true
-        }
-      ] : [];
-      
-      // Mock data for trending adventures
-      const mockTrendingAdventures = [
-        {
-          id: 'trend-1',
-          title: 'Urban Explorer',
-          location: 'Singapore Downtown',
-          checkpoints: 5,
-          creator: 'adventure_master',
-          participants: 24,
-          rating: 4.7
-        },
-        {
-          id: 'trend-2',
-          title: 'Nature Trail',
-          location: 'Bukit Timah Nature Reserve',
-          checkpoints: 3,
-          creator: 'nature_lover',
-          participants: 18,
-          rating: 4.5
-        },
-        {
-          id: 'trend-3',
-          title: 'Historical Journey',
-          location: 'Chinatown',
-          checkpoints: 4,
-          creator: 'history_buff',
-          participants: 32,
-          rating: 4.8
-        },
-        {
-          id: 'trend-4',
-          title: 'Food Adventure',
-          location: 'Hawker Centers Tour',
-          checkpoints: 6,
-          creator: 'foodie_explorer',
-          participants: 45,
-          rating: 4.9
-        }
-      ];
-      
-      setSavedAdventures(mockSavedAdventures);
-      setTrendingAdventures(mockTrendingAdventures);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    loadAdventure();
+  }, [location, navigate]);
   
-  const handleCreateNew = () => {
-    // If user entered an adventure idea, pass it to the prompt page
-    if (adventureIdea.trim()) {
-      navigate(`/prompt?idea=${encodeURIComponent(adventureIdea)}`);
+  // Update time elapsed
+  useEffect(() => {
+    if (!adventure) return;
+    
+    const startTime = new Date(adventure.startTime).getTime();
+    
+    const timer = setInterval(() => {
+      const now = Date.now();
+      const elapsed = Math.floor((now - startTime) / 60000); // minutes
+      setTimeElapsed(elapsed);
+    }, 60000); // update every minute
+    
+    // Initial calculation
+    const now = Date.now();
+    const elapsed = Math.floor((now - startTime) / 60000); // minutes
+    setTimeElapsed(elapsed);
+    
+    return () => clearInterval(timer);
+  }, [adventure]);
+  
+  // Format time for display
+  const formatTime = (minutes: number) => {
+    if (minutes < 60) {
+      return `${minutes} min`;
     } else {
-      navigate('/prompt');
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
     }
   };
   
-  const handleContinueAdventure = (adventureId: string) => {
-    // In a real app, this would load the saved adventure state
-    console.log(`Continuing adventure ${adventureId}`);
-    navigate(`/prompt-response?adventure=${adventureId}`);
+  // Format date for display
+  const formatDate = (isoString: string) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
   
-  const handleJoinAdventure = (adventureId: string) => {
-    // In a real app, this would make an API call to join the adventure
-    console.log(`Joining adventure ${adventureId}`);
-    navigate(`/prompt-response?adventure=${adventureId}`);
+  // Handle checkpoint completion
+  const handleCompleteCheckpoint = (checkpointId: number) => {
+    if (!adventure) return;
+    
+    // Update the checkpoint
+    const updatedCheckpoints = adventure.checkpoints.map(cp => {
+      if (cp.id === checkpointId) {
+        return {
+          ...cp,
+          completed: true,
+          timestamp: new Date().toISOString()
+        };
+      }
+      return cp;
+    });
+    
+    // Calculate new progress
+    const completedCount = updatedCheckpoints.filter(cp => cp.completed).length;
+    const totalCheckpoints = updatedCheckpoints.length;
+    const newProgress = Math.round((completedCount / totalCheckpoints) * 100);
+    
+    // Update adventure data
+    setAdventure({
+      ...adventure,
+      checkpoints: updatedCheckpoints,
+      progress: newProgress
+    });
+    
+    // Move to next checkpoint
+    const currentIndex = adventure.checkpoints.findIndex(cp => cp.id === checkpointId);
+    if (currentIndex < adventure.checkpoints.length - 1) {
+      setActiveCheckpoint(currentIndex + 1);
+    }
   };
   
-  // Format progress bar
-  const renderProgressBar = (progress: number) => {
+  // Custom timeline item template
+  const timelineItemTemplate = (item: CheckpointData) => {
+    // Special case for Final Destination (Community Center)
+    if (item.title === 'Final Destination') {
+      return (
+        <div className={`p-4 border rounded-lg ${
+          item.completed ? 'bg-green-50 border-green-200' : 
+          (item.id === adventure?.checkpoints[activeCheckpoint || 0].id ? 'bg-indigo-50 border-indigo-200' : 'bg-gray-50 border-gray-200')
+        } flex flex-col items-center`}>
+          <h3 className="text-lg font-medium text-gray-800 text-center mb-2">{item.title}</h3>
+          
+          {item.completed && (
+            <span className="text-sm text-green-600 flex items-center mb-2">
+              <i className="pi pi-check-circle mr-1"></i>
+              Completed at {formatDate(item.timestamp)}
+            </span>
+          )}
+          
+          <p className="text-gray-600 mb-2 text-center">{item.description}</p>
+          
+          <div className="text-sm text-gray-500 text-center flex items-center">
+            <i className="pi pi-map-marker mr-1"></i>
+            {item.location}
+          </div>
+          
+          {!item.completed && item.id === adventure?.checkpoints[activeCheckpoint || 0].id && (
+            <Button
+              label="Complete Checkpoint"
+              icon="pi pi-check"
+              className="mt-3 bg-indigo-500 hover:bg-indigo-600 border-none text-white"
+              onClick={() => handleCompleteCheckpoint(item.id)}
+            />
+          )}
+        </div>
+      );
+    }
+    
+    // Regular template for other checkpoints
     return (
-      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-        <div 
-          className="bg-indigo-500 h-2.5 rounded-full" 
-          style={{ width: `${progress}%` }}
-        ></div>
+      <div className={`p-4 border rounded-lg ${
+        item.completed ? 'bg-green-50 border-green-200' : 
+        (item.id === adventure?.checkpoints[activeCheckpoint || 0].id ? 'bg-indigo-50 border-indigo-200' : 'bg-gray-50 border-gray-200')
+      }`}>
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-lg font-medium text-gray-800">{item.title}</h3>
+          {item.completed && (
+            <span className="text-sm text-green-600 flex items-center">
+              <i className="pi pi-check-circle mr-1"></i>
+              Completed at {formatDate(item.timestamp)}
+            </span>
+          )}
+        </div>
+        <p className="text-gray-600 mb-2">{item.description}</p>
+        <div className="text-sm text-gray-500">
+          <i className="pi pi-map-marker mr-1"></i>
+          {item.location}
+        </div>
+        
+        {!item.completed && item.id === adventure?.checkpoints[activeCheckpoint || 0].id && (
+          <Button
+            label="Complete Checkpoint"
+            icon="pi pi-check"
+            className="mt-3 bg-indigo-500 hover:bg-indigo-600 border-none text-white"
+            onClick={() => handleCompleteCheckpoint(item.id)}
+          />
+        )}
       </div>
     );
   };
   
-  // Format rating with stars
-  const renderRating = (rating: number) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    
+  // Custom timeline marker template
+  const timelineMarkerTemplate = (item: CheckpointData) => {
     return (
-      <div className="flex items-center">
-        <span className="mr-1 font-medium">{rating.toFixed(1)}</span>
-        <div className="flex text-yellow-400">
-          {[...Array(5)].map((_, i) => (
-            <span key={i} className="text-lg">
-              {i < fullStars ? '★' : (i === fullStars && hasHalfStar ? '⯨' : '☆')}
-            </span>
-          ))}
-        </div>
-      </div>
+      <span className={`flex items-center justify-center w-8 h-8 rounded-full ${
+        item.completed ? 'bg-green-500 text-white' : 
+        (item.id === adventure?.checkpoints[activeCheckpoint || 0].id ? 'bg-indigo-500 text-white' : 'bg-gray-300 text-gray-600')
+      }`}>
+        {item.completed ? <i className="pi pi-check"></i> : item.id}
+      </span>
     );
   };
   
   return (
     <div className="min-h-screen bg-blue-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center mb-4 md:mb-0">
-              <img src={windsurfIcon} alt="Windsurf" className="w-10 h-10 mr-3" />
+      <Header pageTitle={PAGE_TITLES.EXPLORE_PAGE_TITLE || "Explore Adventure"} />
+      
+      <main className="flex-grow container mx-auto px-4 py-8">
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <p className="text-gray-500">Loading adventure data...</p>
+          </div>
+        ) : adventure ? (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+            {/* Adventure Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
               <div>
-                <h1 className="text-2xl font-bold">{APP_NAME}</h1>
-                <p className="text-sm opacity-90">Embark on Your Next Great Adventure!</p>
+                <h1 className="text-2xl font-bold text-gray-800 mb-1">{adventure.title}</h1>
+              </div>
+              
+              <div className="mt-4 md:mt-0 flex items-center">
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  adventure.transportMode === 'Public' ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-800'
+                }`}>
+                  <i className={`pi ${adventure.transportMode === 'Public' ? 'pi-ticket' : 'pi-car'} mr-1`}></i>
+                  {adventure.transportMode} Transport
+                </span>
               </div>
             </div>
-            <div className="flex items-center">
-              {username ? (
-                <div className="flex items-center">
-                  <span className="text-white mr-4">Welcome, {username}</span>
-                  <Link to="/login" className="text-white opacity-80 hover:opacity-100 transition-opacity">
-                    <i className="pi pi-sign-out mr-1"></i>
-                    Sign Out
-                  </Link>
+            
+            {/* Progress and Time */}
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="text-lg font-medium text-gray-700">Adventure Progress</h2>
+                <span className="text-indigo-600 font-medium">{adventure.progress}%</span>
+              </div>
+              <ProgressBar value={adventure.progress} className="h-2" />
+              
+              <div className="flex flex-col sm:flex-row justify-between mt-4">
+                <div className="text-sm text-gray-600 mb-2 sm:mb-0">
+                  <i className="pi pi-clock mr-1"></i>
+                  Started: {formatDate(adventure.startTime)}
                 </div>
+                <div className="text-sm text-gray-600">
+                  <i className="pi pi-hourglass mr-1"></i>
+                  Time elapsed: {formatTime(timeElapsed)} / {formatTime(adventure.estimatedDuration)}
+                </div>
+              </div>
+            </div>
+            
+            {/* Current Location */}
+            <div className="mb-8">
+              <h2 className="text-lg font-medium text-gray-700 mb-3 text-center">Current Location</h2>
+              <Card className="bg-indigo-50 border border-indigo-100">
+                <div className="flex flex-col items-center text-center">
+                  <div>
+                    <h3 className="text-indigo-700 font-medium mb-1 text-center">
+                      {adventure.checkpoints[activeCheckpoint || 0].location}
+                    </h3>
+                    <p className="text-indigo-600 text-center">
+                      {adventure.checkpoints[activeCheckpoint || 0].description}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+            
+            {/* Timeline */}
+            <div className="w-full">
+              <h2 className="text-lg font-medium text-gray-700 mb-4">Adventure Timeline</h2>
+              <Timeline 
+                value={adventure.checkpoints} 
+                content={timelineItemTemplate}
+                marker={timelineMarkerTemplate}
+                className="custom-timeline w-full"
+              />
+            </div>
+            
+            {/* Navigation buttons */}
+            <div className="flex justify-between mt-8">
+              <Button
+                label="Back to Home"
+                icon="pi pi-home"
+                onClick={() => navigate('/home')}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-700 border-none"
+              />
+              
+              {adventure.progress === 100 ? (
+                <Button
+                  label="Complete Adventure"
+                  icon="pi pi-flag-fill"
+                  className="bg-green-500 hover:bg-green-600 text-white border-none"
+                  onClick={() => {
+                    alert('Congratulations! You have completed this adventure.');
+                    navigate('/home');
+                  }}
+                />
               ) : (
-                <Link to="/login" className="text-white opacity-80 hover:opacity-100 transition-opacity">
-                  <i className="pi pi-sign-in mr-1"></i>
-                  Sign In
-                </Link>
+                <Button
+                  label="Share Progress"
+                  icon="pi pi-share-alt"
+                  className="bg-indigo-500 hover:bg-indigo-600 text-white border-none"
+                  onClick={() => {
+                    alert('Adventure progress shared!');
+                  }}
+                />
               )}
             </div>
           </div>
-        </div>
-      </header>
-      
-      {/* Main Content */}
-      <main className="flex-grow container mx-auto px-4 py-8">
-        {/* Welcome Section */}
-        <section className="mb-10">
-          <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-3">Welcome to {APP_NAME}!</h2>
-            <p className="text-gray-600 mb-4">{APP_DESCRIPTION} Create custom adventures, explore new places, and share your experiences with friends.</p>
-            
-            <div className="mt-6">
-              <h3 className="text-lg font-medium text-gray-700 mb-2">Start a New Adventure</h3>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  label={BUTTON_LABELS.GET_STARTED || "Get Started"}
-                  icon="pi pi-plus"
-                  onClick={handleCreateNew}
-                  className="px-4 py-2 text-white bg-indigo-500 hover:bg-indigo-600 border-none rounded-lg"
-                />
-              </div>
-            </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+            <h2 className="text-xl font-medium text-gray-700 mb-4">No Adventure Found</h2>
+            <p className="text-gray-600 mb-6">
+              We couldn't find the adventure you're looking for. Please start a new adventure or return home.
+            </p>
+            <Button
+              label="Back to Home"
+              icon="pi pi-home"
+              onClick={() => navigate('/home')}
+              className="bg-indigo-500 hover:bg-indigo-600 text-white border-none"
+            />
           </div>
-        </section>
-        
-        {/* Saved Adventures Section */}
-        {savedAdventures.length > 0 && (
-          <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Your Saved Adventures</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {savedAdventures.map(adventure => (
-                <div 
-                  key={adventure.id} 
-                  className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-                >
-                  <div className="p-5">
-                    <h3 className="text-xl font-bold text-gray-800 mb-1">{adventure.title}</h3>
-                    <p className="text-sm text-gray-600 mb-3">{adventure.location}</p>
-                    
-                    <div className="flex justify-between mb-2">
-                      <div className="text-sm text-gray-600">
-                        <span className="font-medium">{adventure.checkpoints}</span> checkpoints
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Last played: {adventure.lastPlayed}
-                      </div>
-                    </div>
-                    
-                    <div className="mb-4">
-                      <div className="flex justify-between text-sm text-gray-600">
-                        <span>Progress</span>
-                        <span>{adventure.progress}%</span>
-                      </div>
-                      {renderProgressBar(adventure.progress)}
-                    </div>
-                    
-                    <Button
-                      label="Continue"
-                      icon="pi pi-play"
-                      onClick={() => handleContinueAdventure(adventure.id)}
-                      className="w-full p-2 text-white bg-green-500 hover:bg-green-600 border-none rounded-lg"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
         )}
-        
-        {/* Trending Adventures Section */}
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Trending Adventures</h2>
-          {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="text-indigo-500 text-xl">Loading adventures...</div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {trendingAdventures.map(adventure => (
-                <div 
-                  key={adventure.id} 
-                  className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-                >
-                  <div className="h-32 bg-gradient-to-r from-indigo-500 to-purple-600 relative">
-                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent text-white">
-                      <h4 className="text-lg font-bold">{adventure.title}</h4>
-                      <p className="text-xs opacity-90">{adventure.location}</p>
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <div className="flex justify-between mb-3">
-                      <div className="text-sm text-gray-600">
-                        <span className="font-medium">{adventure.checkpoints}</span> checkpoints
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        <span className="font-medium">{adventure.participants}</span> joined
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between items-center mb-4">
-                      <div className="text-sm text-gray-600">
-                        By <span className="font-medium">{adventure.creator}</span>
-                      </div>
-                      {renderRating(adventure.rating)}
-                    </div>
-                    
-                    <Button
-                      label={BUTTON_LABELS.JOIN_ADVENTURE || "Join Adventure"}
-                      onClick={() => handleJoinAdventure(adventure.id)}
-                      className="w-full p-2 text-white bg-indigo-500 hover:bg-indigo-600 border-none rounded-lg"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
       </main>
       
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-6">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <p className="text-sm opacity-80">&copy; 2025 {APP_NAME}. All rights reserved.</p>
-              <p className="text-xs opacity-60 mt-1">Version 1.0.0</p>
-            </div>
-            <div className="flex gap-6">
-              <Link to="/prompt" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
-                Create Adventure
-              </Link>
-              <Link to="/login" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
-                Account
-              </Link>
-              <a href="#" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
-                Community
-              </a>
-              <a href="#" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
-                Help
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
