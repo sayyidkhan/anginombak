@@ -3,14 +3,14 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
 import { Link, useNavigate } from 'react-router-dom';
-import windsurfIcon from '../assets/windsurf.svg';
+import windsurfIcon from '../../assets/windsurf.svg';
 import { 
   APP_NAME, 
   PAGE_TITLES, 
   FORM_LABELS, 
   BUTTON_LABELS, 
   PLACEHOLDERS 
-} from '../utils/constants';
+} from '../../utils/constants';
 
 const Login = () => {
   const [username, setUsername] = useState('');

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Slider } from 'primereact/slider';
-import LocationMap from './LocationMap';
+import LocationMap from '../common/LocationMap';
 import { 
   APP_NAME, 
   PAGE_TITLES, 
@@ -14,7 +14,7 @@ import {
   MOBILE_CHECKPOINT_TITLES,
   PLAYER1_SUGGESTIONS,
   PLAYER2_SUGGESTIONS
-} from '../utils/constants';
+} from '../../utils/constants';
 import './slider-styles.css';
 
 // Define checkpoint steps
@@ -40,6 +40,7 @@ const Prompt = () => {
   
   // Get username from URL
   const location = useLocation();
+  const navigate = useNavigate();
   
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -81,7 +82,18 @@ const Prompt = () => {
         duration,
         isPublic 
       });
-      // Add navigation logic here for final submission
+      // Navigate to prompt-response page
+      navigate('/prompt-response', { 
+        state: { 
+          player1, 
+          player2, 
+          startLocation, 
+          checkpoints, 
+          duration,
+          isPublic,
+          username 
+        } 
+      });
     }
   };
 
