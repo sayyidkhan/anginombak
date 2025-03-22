@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   APP_NAME, 
@@ -11,7 +10,7 @@ import windsurfIcon from '../../assets/windsurf.svg';
 
 const Explore: React.FC = () => {
   const [username, setUsername] = useState<string | null>(null);
-  const [adventureIdea, setAdventureIdea] = useState('');
+  const [adventureIdea] = useState('');
   const [savedAdventures, setSavedAdventures] = useState<any[]>([]);
   const [trendingAdventures, setTrendingAdventures] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
