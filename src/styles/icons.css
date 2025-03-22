@@ -1,0 +1,65 @@
+/* Custom icons CSS file that doesn't rely on primeicons package */
+/* This file contains only the icon classes that are actually used in the application */
+
+.pi {
+  font-family: 'PrimeIcons';
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  display: inline-block;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Common icons used in the application */
+.pi-check:before {
+  content: "\e909";
+}
+
+.pi-times:before {
+  content: "\e90b";
+}
+
+.pi-user:before {
+  content: "\e939";
+}
+
+.pi-search:before {
+  content: "\e908";
+}
+
+.pi-arrow-right:before {
+  content: "\e902";
+}
+
+.pi-arrow-left:before {
+  content: "\e901";
+}
+
+.pi-map-marker:before {
+  content: "\e94d";
+}
+
+.pi-plus:before {
+  content: "\e90a";
+}
+
+.pi-minus:before {
+  content: "\e90f";
+}
+
+.pi-info-circle:before {
+  content: "\e923";
+}
+
+.pi-exclamation-triangle:before {
+  content: "\e922";
+}
+
+.pi-spinner:before {
+  content: "\e92e";
+}
+
+/* Add more icons as needed */
