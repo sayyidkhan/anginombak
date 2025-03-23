@@ -4,7 +4,7 @@
  */
 
 // API key should be stored in .env file as VITE_GEMINI_API_KEY
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyDvfWPi1PkWrqLmwk8ELUdAmk1C9VlbfT0';
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 interface GeminiRequestContent {
