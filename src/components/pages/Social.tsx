@@ -115,7 +115,7 @@ const Social: React.FC = () => {
       likes: 42,
       comments: 15,
       timestamp: '1 day ago',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      videoUrl: 'https://www.youtube.com/watch?v=8A8NnEhnqWA',
       isPublic: true,
     },
   ]);
@@ -401,16 +401,6 @@ const Social: React.FC = () => {
         onHide: closeShareDialog,
         content: (
           <div className="flex flex-col gap-4 relative p-0">
-            {/* <div className="absolute top-0 right-0 p-2">
-              <Button
-                icon="pi pi-times"
-                className="p-button-rounded p-button-text p-button-sm p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
-                onClick={closeShareDialog}
-                aria-label="Close"
-                style={{ fontSize: '1.2rem', width: '2rem', height: '2rem' }}
-                tabIndex={0}
-              />
-            </div> */}
             <div className="flex flex-col gap-2 mt-4 w-fit mx-auto">
               {sharePlatforms.map(platform => (
                 <Button
@@ -437,6 +427,18 @@ const Social: React.FC = () => {
         )
       });
     }
+  };
+
+  // Helper function to extract YouTube video ID
+  const getYouTubeVideoId = (url: string): string | null => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  // Helper function to check if URL is a YouTube URL
+  const isYouTubeUrl = (url: string): boolean => {
+    return url.includes('youtube.com') || url.includes('youtu.be');
   };
 
   // Clean up video preview URL when component unmounts
@@ -487,12 +489,23 @@ const Social: React.FC = () => {
               
               {post.videoUrl && (
                 <div className="mb-4 rounded-lg overflow-hidden">
-                  <video 
-                    src={post.videoUrl} 
-                    controls 
-                    className="w-full h-auto max-h-80 object-cover"
-                    preload="metadata"
-                  />
+                  {isYouTubeUrl(post.videoUrl) ? (
+                    <iframe 
+                      src={`https://www.youtube.com/embed/${getYouTubeVideoId(post.videoUrl)}?modestbranding=1&rel=0&showinfo=0`} 
+                      frameBorder="0" 
+                      allowFullScreen 
+                      className="w-full aspect-video"
+                      style={{ height: '300px' }}
+                    />
+                  ) : (
+                    <video 
+                      src={post.videoUrl} 
+                      controls 
+                      className="w-full aspect-video"
+                      style={{ height: '300px' }}
+                      preload="metadata"
+                    />
+                  )}
                 </div>
               )}
               
