@@ -100,7 +100,33 @@ export const generateContentWithSystemPrompt = async (
   return generateContent(combinedPrompt);
 };
 
+/**
+ * Enhance a text prompt to make it more detailed and creative
+ * @param prompt The original text prompt to enhance
+ * @returns The enhanced text prompt
+ */
+export const enhancePrompt = async (prompt: string): Promise<string> => {
+  const systemPrompt = 
+    "You are a creative writing assistant. Your task is to enhance the user's prompt by making it more detailed, " +
+    "creative, and engaging. Add descriptive elements, sensory details, and make it more vivid without changing " +
+    "the core meaning or intent. Keep the enhanced version concise but impactful. " +
+    "DO NOT use any markdown formatting like asterisks, underscores, or hashtags in your response. " +
+    "Return plain text only.";
+  
+  const enhancedText = await generateContentWithSystemPrompt(systemPrompt, prompt);
+  
+  // Additional cleanup to remove any markdown that might have been included
+  return enhancedText
+    .replace(/\*\*/g, '') // Remove bold formatting
+    .replace(/\*/g, '')   // Remove italic formatting
+    .replace(/\_\_/g, '') // Remove underscores
+    .replace(/\_/g, '')   // Remove single underscores
+    .replace(/\#\s/g, '') // Remove heading markers
+    .trim();
+};
+
 export default {
   generateContent,
-  generateContentWithSystemPrompt
+  generateContentWithSystemPrompt,
+  enhancePrompt
 };

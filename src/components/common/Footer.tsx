@@ -1,15 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { APP_NAME } from '../../utils/constants';
+import anginombakIconWhite from '../../assets/anginombak-icon-white.svg';
 
 const Footer: React.FC = () => {
   return (
     <footer className="bg-gray-800 text-white py-6">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0">
-            <p className="text-sm opacity-80">&copy; 2025 {APP_NAME}. All rights reserved.</p>
-            <p className="text-xs opacity-60 mt-1">Version 1.0.0</p>
+          <div className="mb-4 md:mb-0 flex items-center">
+            <img src={anginombakIconWhite} alt="Angin Ombak" className="w-12 h-12 mr-3" />
+            <div>
+              <p className="text-sm opacity-80">&copy; 2025 {APP_NAME}. All rights reserved.</p>
+              <p className="text-xs opacity-60 mt-1">Version 1.0.0</p>
+            </div>
           </div>
           {/* Mobile: vertical, Desktop: horizontal */}
           <div className="flex flex-col md:flex-row md:gap-6 items-center md:items-start gap-3">

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'primereact/button';
 import { Link } from 'react-router-dom';
-import windsurfIcon from '../assets/windsurf.svg';
+import anginombakIcon from '../assets/anginombak-icon.svg';
 
 const MainPage: React.FC = () => {
   return (
@@ -9,7 +9,7 @@ const MainPage: React.FC = () => {
       {/* Header */}
       <div className="bg-white p-4 shadow-md flex justify-between items-center">
         <h1 className="text-xl font-bold text-indigo-600">The App</h1>
-        <img src={windsurfIcon} alt="Windsurf" className="w-8 h-8" />
+        <img src={anginombakIcon} alt="Angin Ombak" className="w-14 h-14" />
       </div>
       
       <div className="flex flex-1">

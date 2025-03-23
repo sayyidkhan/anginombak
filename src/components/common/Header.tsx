@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import anginombakIconWhite from '../../assets/anginombak-icon-white.svg';
 import { APP_NAME } from '../../utils/constants';
-import windsurfIcon from '../../assets/windsurf.svg';
 
 interface HeaderProps {
   pageTitle?: string;
@@ -22,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({ pageTitle }) => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center mb-4 md:mb-0">
             <Link to="/" className="flex items-center">
-              <img src={windsurfIcon} alt="Windsurf" className="w-10 h-10 mr-3" />
+              <img src={anginombakIconWhite} alt="Angin Ombak" className="w-16 h-16 mr-3" />
               <div>
                 <h1 className="text-2xl font-bold">{APP_NAME}</h1>
                 <p className="text-sm opacity-90">Embark on Your Next Great Adventure!</p>

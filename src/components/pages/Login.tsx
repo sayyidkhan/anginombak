@@ -3,7 +3,7 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
 import { Link, useNavigate } from 'react-router-dom';
-import windsurfIcon from '../../assets/windsurf.svg';
+import anginombakIcon from '../../assets/anginombak-icon.svg';
 import { 
   APP_NAME, 
   PAGE_TITLES, 
@@ -22,7 +22,7 @@ const Login = () => {
       <div className="bg-white rounded-3xl shadow-lg p-8 w-full max-w-md mx-4">
         <div className="flex flex-col items-center mb-6">
           <h2 className="text-xl font-bold text-indigo-600 mb-2">{APP_NAME}</h2>
-          <img src={windsurfIcon} alt="Windsurf" className="w-16 h-16 mb-4" />
+          <img src={anginombakIcon} alt="AnginOmbak" className="w-24 h-24 mb-4" />
           <h1 className="text-2xl text-gray-600 font-medium text-center">{PAGE_TITLES.LOGIN}</h1>
         </div>
         

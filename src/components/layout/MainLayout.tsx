@@ -27,7 +27,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       <Footer />
       
       {!hideAiAssistant && (
-        <div className="fixed bottom-0 right-0 m-4 z-50">
+        <div className="fixed bottom-0 right-0 m-4 z-[9999]">
           <AiChat />
         </div>
       )}
