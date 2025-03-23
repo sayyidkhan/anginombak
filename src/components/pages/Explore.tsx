@@ -941,7 +941,7 @@ const Explore: React.FC = () => {
                   className="bg-green-500 hover:bg-green-600 text-white border-none"
                   onClick={() => {
                     alert('Congratulations! You have completed this adventure.');
-                    navigate('/home');
+                    navigate('/marketplace');
                   }}
                 />
               ) : (

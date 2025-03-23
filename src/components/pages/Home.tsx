@@ -305,12 +305,15 @@ const Explore: React.FC = () => {
               <Link to="/prompt" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
                 Create Adventure
               </Link>
+              <Link to="/marketplace" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
+                Marketplace
+              </Link>
+              <Link to="/social" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
+                Social
+              </Link>
               <Link to="/login" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
                 Account
               </Link>
-              <a href="#" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
-                Community
-              </a>
               <a href="#" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
                 Help
               </a>
