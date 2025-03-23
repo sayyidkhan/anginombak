@@ -55,17 +55,37 @@ export default tseslint.config({
 
 ## AnginOmbak Application
 
-AnginOmbak is a location-based application that helps users find and select locations on a map.
+AnginOmbak is a location-based application that helps users find and select locations on a map, share adventures, and connect with other users.
 
 ### Features
 
-- Interactive map using Leaflet
-- Multiple ways to select a location:
-  - Click directly on the map
-  - Use current location with browser geolocation
-  - Search by location name or postal code
-- Location suggestions with Google Places API
-- Support for Singapore postal codes with district mapping
+- **Location Services**
+  - Interactive map using Leaflet
+  - Multiple ways to select a location:
+    - Click directly on the map
+    - Use current location with browser geolocation
+    - Search by location name or postal code
+  - Location suggestions with Google Places API
+  - Support for Singapore postal codes with district mapping
+
+- **Social Features**
+  - User posts with text and media content
+  - Video sharing support (both direct video files and YouTube videos)
+  - Like, comment, and share functionality
+  - Public/private post visibility options
+  - User profiles with customizable avatars
+
+- **Marketplace**
+  - Browse local vendors and services
+  - Filter and sort marketplace listings
+  - Detailed vendor information
+
+- **User Interface**
+  - Consistent styling across all pages
+  - Responsive design for mobile and desktop
+  - Intuitive navigation with footer links
+  - Grey button styling for Social page
+  - Indigo button styling for Marketplace
 
 ### Google Places API Integration
 
