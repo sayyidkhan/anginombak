@@ -6,6 +6,7 @@ import LocationMap from '../common/LocationMap';
 import Header from '../common/Header';
 import Footer from '../common/Footer';
 import AiChat from '../common/AiChat';
+import { enhancePrompt } from '../../services/GeminiService';
 import { 
   PAGE_TITLES, 
   FORM_LABELS, 
@@ -28,6 +29,12 @@ const STEPS = [
   'MAKE_PUBLIC'
 ];
 
+// Family bonding prompt templates
+const FAMILY_BONDING_PROMPTS = {
+  PLAYER1: "I want to create a financial adventure that helps my family bond while learning about money management. We should include activities that teach budgeting, saving, and making smart financial decisions together.",
+  PLAYER2: "I'd like to visit places where our family can engage in team-building activities, have meaningful conversations, and create lasting memories together. Places that offer both fun and opportunities for deeper connection."
+};
+
 const Prompt = () => {
   const [player1, setPlayer1] = useState('');
   const [player2, setPlayer2] = useState('');
@@ -37,6 +44,14 @@ const Prompt = () => {
   const [isPublic, setIsPublic] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  
+  // For enhance functionality
+  const [originalPlayer1, setOriginalPlayer1] = useState('');
+  const [originalPlayer2, setOriginalPlayer2] = useState('');
+  const [isEnhancingPlayer1, setIsEnhancingPlayer1] = useState(false);
+  const [isEnhancingPlayer2, setIsEnhancingPlayer2] = useState(false);
+  const [player1Enhanced, setPlayer1Enhanced] = useState(false);
+  const [player2Enhanced, setPlayer2Enhanced] = useState(false);
   
   // Get username from URL
   const location = useLocation();
@@ -186,6 +201,56 @@ const Prompt = () => {
       : BUTTON_LABELS.CONTINUE;
   };
 
+  // Handle enhance button click for Player 1
+  const handleEnhancePlayer1 = async () => {
+    if (!player1.trim()) return;
+    
+    try {
+      setIsEnhancingPlayer1(true);
+      setOriginalPlayer1(player1);
+      
+      const enhancedText = await enhancePrompt(player1);
+      setPlayer1(enhancedText);
+      setPlayer1Enhanced(true);
+    } catch (error) {
+      console.error('Error enhancing Player 1 prompt:', error);
+      // Show error message to user
+    } finally {
+      setIsEnhancingPlayer1(false);
+    }
+  };
+  
+  // Handle revert button click for Player 1
+  const handleRevertPlayer1 = () => {
+    setPlayer1(originalPlayer1);
+    setPlayer1Enhanced(false);
+  };
+  
+  // Handle enhance button click for Player 2
+  const handleEnhancePlayer2 = async () => {
+    if (!player2.trim()) return;
+    
+    try {
+      setIsEnhancingPlayer2(true);
+      setOriginalPlayer2(player2);
+      
+      const enhancedText = await enhancePrompt(player2);
+      setPlayer2(enhancedText);
+      setPlayer2Enhanced(true);
+    } catch (error) {
+      console.error('Error enhancing Player 2 prompt:', error);
+      // Show error message to user
+    } finally {
+      setIsEnhancingPlayer2(false);
+    }
+  };
+  
+  // Handle revert button click for Player 2
+  const handleRevertPlayer2 = () => {
+    setPlayer2(originalPlayer2);
+    setPlayer2Enhanced(false);
+  };
+
   // Render the appropriate step content
   const renderStepContent = () => {
     switch (STEPS[currentStep]) {
@@ -202,6 +267,26 @@ const Prompt = () => {
               autoFocus
               rows={5}
             />
+            <div className="flex justify-between items-center mt-2">
+              <div className="flex gap-2">
+                <Button
+                  label="Enhance"
+                  icon="pi pi-magic"
+                  className="p-button-outlined p-button-secondary bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300"
+                  onClick={handleEnhancePlayer1}
+                  loading={isEnhancingPlayer1}
+                  disabled={!player1.trim() || isEnhancingPlayer1}
+                />
+                {player1Enhanced && (
+                  <Button
+                    label="Revert"
+                    icon="pi pi-undo"
+                    className="p-button-outlined bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300"
+                    onClick={handleRevertPlayer1}
+                  />
+                )}
+              </div>
+            </div>
             <div className="mt-2 mb-1 text-sm text-gray-600 font-medium text-left">Suggested prompts:</div>
             <div className="flex flex-wrap gap-2 mt-1">
               <button 
@@ -222,6 +307,12 @@ const Prompt = () => {
               >
                 Budgeting
               </button>
+              <button 
+                className="text-sm text-indigo-600 hover:text-indigo-800 rounded-full px-4 py-1 bg-transparent border border-indigo-600 hover:border-indigo-800"
+                onClick={() => setPlayer1(FAMILY_BONDING_PROMPTS.PLAYER1)}
+              >
+                Family Bonding
+              </button>
             </div>
           </div>
         );
@@ -239,6 +330,26 @@ const Prompt = () => {
               autoFocus
               rows={5}
             />
+            <div className="flex justify-between items-center mt-2">
+              <div className="flex gap-2">
+                <Button
+                  label="Enhance"
+                  icon="pi pi-magic"
+                  className="p-button-outlined p-button-secondary bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300"
+                  onClick={handleEnhancePlayer2}
+                  loading={isEnhancingPlayer2}
+                  disabled={!player2.trim() || isEnhancingPlayer2}
+                />
+                {player2Enhanced && (
+                  <Button
+                    label="Revert"
+                    icon="pi pi-undo"
+                    className="p-button-outlined bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300"
+                    onClick={handleRevertPlayer2}
+                  />
+                )}
+              </div>
+            </div>
             <div className="mt-2 mb-1 text-sm text-gray-600 font-medium text-left">Suggested prompts:</div>
             <div className="flex flex-wrap gap-2 mt-1">
               <button 
@@ -258,6 +369,12 @@ const Prompt = () => {
                 onClick={() => setPlayer2(PLAYER2_SUGGESTIONS.VISIT_HOTSPRINGS)}
               >
                 Visit Hotsprings
+              </button>
+              <button 
+                className="text-sm text-indigo-600 hover:text-indigo-800 rounded-full px-4 py-1 bg-transparent border border-indigo-600 hover:border-indigo-800"
+                onClick={() => setPlayer2(FAMILY_BONDING_PROMPTS.PLAYER2)}
+              >
+                Family Bonding
               </button>
             </div>
           </div>

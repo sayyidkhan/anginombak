@@ -77,24 +77,30 @@ const AiChat: React.FC = () => {
 
   if (!isExpanded) {
     return (
-      <Button
-        icon="pi pi-comments"
-        className="p-button-rounded p-button-secondary bg-indigo-500 text-white hover:bg-indigo-600 shadow-lg"
-        style={{ 
-          width: '45px', 
-          height: '45px', 
-          borderRadius: '50%',
-          padding: 0
-        }}
-        onClick={() => setIsExpanded(true)}
-        tooltip="I'm Mr Ombak 🌊"
-        tooltipOptions={{ position: 'left' }}
-      />
+      <div className="flex items-center justify-center" style={{ zIndex: 9999 }}>
+        <Button
+          className="p-button-rounded p-button-secondary bg-indigo-500 text-white hover:bg-indigo-600 shadow-lg"
+          style={{ 
+            width: '60px', 
+            height: '60px', 
+            borderRadius: '50%',
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onClick={() => setIsExpanded(true)}
+          tooltip="I'm Mr Ombak 🌊"
+          tooltipOptions={{ position: 'left' }}
+        >
+          <i className="pi pi-comments text-3xl text-white" />
+        </Button>
+      </div>
     );
   }
 
   return (
-    <Card className="w-80 shadow-lg" style={{ maxHeight: '600px' }}>
+    <Card className="w-80 shadow-lg" style={{ maxHeight: '600px', zIndex: 9999 }}>
       <div className="flex flex-col h-full">
         <div className="flex justify-between items-center mb-3 sticky top-0 bg-white z-10 pb-2 pt-3 border-b border-gray-100">
           <h3 className="text-lg font-medium">I'm Mr Ombak 🌊</h3>
