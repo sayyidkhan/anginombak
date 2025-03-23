@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ProgressBar } from 'primereact/progressbar';
 import { FileUpload } from 'primereact/fileupload';
 import { Carousel } from 'primereact/carousel';
+import ReactMarkdown from 'react-markdown';
 import Header from '../common/Header';
 import Footer from '../common/Footer';
 import CurrentLocation from '../common/CurrentLocation';
@@ -38,6 +39,7 @@ interface AdventureData {
   estimatedDuration: number;
   progress: number;
   checkpoint_counter: number; // Track the current checkpoint index
+  generatedContent?: string | null; // Generated adventure content from Gemini API
 }
 
 const Explore: React.FC = () => {
@@ -46,9 +48,124 @@ const Explore: React.FC = () => {
   const [activeCheckpoint, setActiveCheckpoint] = useState<number | null>(null);
   const [timeElapsed, setTimeElapsed] = useState<number>(0);
   const [expandedCheckpoints, setExpandedCheckpoints] = useState<number[]>([]);
+  const [parsedAdventureContent, setParsedAdventureContent] = useState<Record<number, any>>({});
   
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // Sample adventure data for fallback
+  const sampleAdventure: AdventureData = {
+    id: `sample_adventure_${Date.now()}`,
+    title: 'Financial Adventure in the City',
+    theme: 'Financial Literacy',
+    startLocation: {
+      lat: 1.3521,
+      lng: 103.8198,
+      name: 'Singapore Downtown'
+    },
+    checkpoints: [
+      {
+        id: 1,
+        title: 'Starting Point',
+        description: 'Begin your adventure here. Learn about financial planning basics.',
+        completed: false,
+        timestamp: '',
+        location: 'Financial District'
+      },
+      {
+        id: 2,
+        title: 'Checkpoint 1',
+        description: 'Visit the bank to understand savings accounts and interest rates.',
+        completed: false,
+        timestamp: '',
+        location: 'Local Bank Branch'
+      },
+      {
+        id: 3,
+        title: 'Checkpoint 2',
+        description: 'Explore the park while learning about investment options.',
+        completed: false,
+        timestamp: '',
+        location: 'Central Park'
+      },
+      {
+        id: 4,
+        title: 'Final Destination',
+        description: 'Complete your financial literacy journey at the community center.',
+        completed: false,
+        timestamp: '',
+        location: 'Community Center'
+      }
+    ],
+    transportMode: 'Public',
+    startTime: new Date(Date.now() - 60 * 60000).toISOString(), // 1 hour ago
+    estimatedDuration: 120, // 2 hours
+    progress: 0, // 0% complete
+    checkpoint_counter: 0, // Start at the first checkpoint
+    generatedContent: null
+  };
+  
+  // Parse adventure content into sections for each checkpoint
+  const parseAdventureContent = (content: string | null | undefined) => {
+    if (!content) return { parsedContent: {}, checkpointCount: 0 };
+    
+    try {
+      // Initialize result object with a key for each checkpoint
+      const result: Record<number, any> = {};
+      
+      // Split content by checkpoint headings
+      // Look for patterns like "Checkpoint 1:", "Checkpoint 2:", etc.
+      const checkpointSections = content.split(/(?=\#\#\s*Checkpoint\s*\d+|Starting\s*Point|Final\s*Destination)/gi);
+      
+      // Process each section
+      checkpointSections.forEach((section, index) => {
+        // Extract title
+        const titleMatch = section.match(/(?:\#\#\s*)?(.*?)(?:\:|\n|$)/);
+        const title = titleMatch ? titleMatch[1].trim() : `Checkpoint ${index}`;
+        
+        // Extract location
+        const locationMatch = section.match(/(?:Location\s*\:?\s*)(.*?)(?:\n\s*\-|\n\s*\#|\n\s*Description|\n\s*Activities|\n\s*Estimated|\n\s*Fun Fact|$)/si);
+        const location = locationMatch ? locationMatch[1].trim() : `Location ${index}`;
+        
+        // Extract description
+        const descriptionMatch = section.match(/(?:Description\s*\:?\s*)(.*?)(?:\n\s*\-|\n\s*\#|\n\s*Activities|\n\s*Estimated|\n\s*Fun Fact|$)/si);
+        const description = descriptionMatch ? descriptionMatch[1].trim() : '';
+        
+        // Extract activities
+        const activitiesMatch = section.match(/(?:Activities\s*\:?\s*)(.*?)(?:\n\s*\-|\n\s*\#|\n\s*Estimated|\n\s*Fun Fact|$)/si);
+        const activities = activitiesMatch ? activitiesMatch[1].trim() : '';
+        
+        // Extract time
+        const timeMatch = section.match(/(?:Estimated\s*Time\s*\:?\s*)(.*?)(?:\n\s*\-|\n\s*\#|\n\s*Fun Fact|$)/si);
+        const time = timeMatch ? timeMatch[1].trim() : '';
+        
+        // Extract fun fact
+        const funFactMatch = section.match(/(?:Fun\s*Fact\s*\:?\s*)(.*?)(?:\n\s*\-|\n\s*\#|$)/si);
+        const funFact = funFactMatch ? funFactMatch[1].trim() : '';
+        
+        // Store in result
+        result[index] = {
+          title,
+          location,
+          description,
+          activities,
+          time,
+          funFact
+        };
+      });
+      
+      return { 
+        parsedContent: result, 
+        checkpointCount: Object.keys(result).length 
+      };
+    } catch (error) {
+      console.error('Error parsing adventure content:', error);
+      return { 
+        parsedContent: {}, 
+        checkpointCount: 0 
+      };
+    }
+  };
   
   // Load adventure data
   useEffect(() => {
@@ -56,96 +173,39 @@ const Explore: React.FC = () => {
       try {
         setLoading(true);
         
-        // Check if we have an adventureId in the location state (from PromptResponse page)
-        const adventureId = location.state?.adventureId || new URLSearchParams(location.search).get('id');
-        
-        if (!adventureId) {
-          console.error('No adventure ID provided');
-          navigate('/home');
-          return;
-        }
-        
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Try to load adventure from local storage
-        const storedAdventures = JSON.parse(localStorage.getItem('anginombak_adventures') || '[]');
-        const foundAdventure = storedAdventures.find((adv: any) => adv.id === adventureId);
-        
-        if (foundAdventure) {
-          console.log('Loaded adventure from local storage:', foundAdventure);
-          setAdventure(foundAdventure);
-          setActiveCheckpoint(foundAdventure.checkpoint_counter || 0);
-          setExpandedCheckpoints([foundAdventure.checkpoint_counter || 0]);
+        // Check if adventure data is passed from previous page
+        if (location.state?.adventure) {
+          const adventureData = location.state.adventure;
+          setAdventure(adventureData);
+          
+          // Set active checkpoint to the current checkpoint counter
+          const activeIndex = adventureData.checkpoint_counter || 0;
+          setActiveCheckpoint(activeIndex);
+          setExpandedCheckpoints([activeIndex]);
+          
+          // Parse the adventure content
+          if (adventureData.generatedContent) {
+            const parsed = parseAdventureContent(
+              adventureData.generatedContent
+            );
+            setParsedAdventureContent(parsed.parsedContent);
+          }
         } else {
-          // Fall back to mock data if not found in local storage
-          console.log('Adventure not found in local storage, using mock data');
-          
-          // Mock data for the current adventure
-          const mockAdventure: AdventureData = {
-            id: adventureId,
-            title: 'Financial Adventure in the City',
-            theme: 'Financial Literacy',
-            startLocation: {
-              lat: 1.3521,
-              lng: 103.8198,
-              name: 'Singapore Downtown'
-            },
-            checkpoints: [
-              {
-                id: 1,
-                title: 'Starting Point',
-                description: 'Begin your adventure here. Learn about financial planning basics.',
-                completed: false,
-                timestamp: '',
-                location: 'Financial District'
-              },
-              {
-                id: 2,
-                title: 'Checkpoint 1',
-                description: 'Visit the bank to understand savings accounts and interest rates.',
-                completed: false,
-                timestamp: '',
-                location: 'Local Bank Branch'
-              },
-              {
-                id: 3,
-                title: 'Checkpoint 2',
-                description: 'Explore the park while learning about investment options.',
-                completed: false,
-                timestamp: '',
-                location: 'Central Park'
-              },
-              {
-                id: 4,
-                title: 'Final Destination',
-                description: 'Complete your financial literacy journey at the community center.',
-                completed: false,
-                timestamp: '',
-                location: 'Community Center'
-              }
-            ],
-            transportMode: 'Public',
-            startTime: new Date(Date.now() - 60 * 60000).toISOString(), // 1 hour ago
-            estimatedDuration: 120, // 2 hours
-            progress: 0, // 0% complete
-            checkpoint_counter: 0 // Start at the first checkpoint (Starting Point)
-          };
-          
-          setAdventure(mockAdventure);
+          // For demo purposes, load a sample adventure
+          // In a real app, this would fetch from an API or database
+          setAdventure(sampleAdventure);
           setActiveCheckpoint(0);
           setExpandedCheckpoints([0]);
         }
-        
-        setLoading(false);
       } catch (error) {
         console.error('Error loading adventure:', error);
+      } finally {
         setLoading(false);
       }
     };
     
     loadAdventure();
-  }, [location, navigate]);
+  }, [location.state]);
   
   // Update time elapsed
   useEffect(() => {
@@ -651,6 +711,63 @@ const Explore: React.FC = () => {
                 </div>
               )}
               
+              {/* Display parsed adventure content */}
+              {parsedAdventureContent[index] && (
+                <div className="mt-4 w-full bg-indigo-50 rounded-lg p-4">
+                  <h4 className="text-md font-semibold text-indigo-700 mb-3">
+                    <i className="pi pi-compass mr-2"></i>
+                    {parsedAdventureContent[index].title || `Checkpoint ${index + 1}`}
+                  </h4>
+                  
+                  {parsedAdventureContent[index].description && (
+                    <div className="mb-3">
+                      <h5 className="text-sm font-medium text-indigo-600 mb-1">Description</h5>
+                      <div className="prose prose-indigo max-w-none text-gray-700">
+                        <ReactMarkdown>
+                          {parsedAdventureContent[index].description}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {parsedAdventureContent[index].activities && (
+                    <div className="mb-3">
+                      <h5 className="text-sm font-medium text-indigo-600 mb-1">
+                        <i className="pi pi-ticket mr-1"></i>
+                        Activities
+                      </h5>
+                      <div className="prose prose-indigo max-w-none text-gray-700">
+                        <ReactMarkdown>
+                          {parsedAdventureContent[index].activities}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex flex-col sm:flex-row sm:justify-between">
+                    {parsedAdventureContent[index].time && (
+                      <div className="mb-3 sm:mb-0 sm:w-1/2 sm:pr-2">
+                        <h5 className="text-sm font-medium text-indigo-600 mb-1">
+                          <i className="pi pi-clock mr-1"></i>
+                          Estimated Time
+                        </h5>
+                        <p className="text-gray-700">{parsedAdventureContent[index].time}</p>
+                      </div>
+                    )}
+                    
+                    {parsedAdventureContent[index].funFact && (
+                      <div className="sm:w-1/2 sm:pl-2">
+                        <h5 className="text-sm font-medium text-indigo-600 mb-1">
+                          <i className="pi pi-info-circle mr-1"></i>
+                          Fun Fact
+                        </h5>
+                        <p className="text-gray-700 italic">{parsedAdventureContent[index].funFact}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              
               {/* Media upload section */}
               <div className="mt-3 w-full">
                 <FileUpload
@@ -769,6 +886,63 @@ const Explore: React.FC = () => {
                     }}
                   />
                 )}
+              </div>
+            )}
+            
+            {/* Display parsed adventure content */}
+            {parsedAdventureContent[index] && (
+              <div className="mt-4 w-full bg-indigo-50 rounded-lg p-4">
+                <h4 className="text-md font-semibold text-indigo-700 mb-3">
+                  <i className="pi pi-compass mr-2"></i>
+                  {parsedAdventureContent[index].title || `Checkpoint ${index + 1}`}
+                </h4>
+                
+                {parsedAdventureContent[index].description && (
+                  <div className="mb-3">
+                    <h5 className="text-sm font-medium text-indigo-600 mb-1">Description</h5>
+                    <div className="prose prose-indigo max-w-none text-gray-700">
+                      <ReactMarkdown>
+                        {parsedAdventureContent[index].description}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                )}
+                
+                {parsedAdventureContent[index].activities && (
+                  <div className="mb-3">
+                    <h5 className="text-sm font-medium text-indigo-600 mb-1">
+                      <i className="pi pi-ticket mr-1"></i>
+                      Activities
+                    </h5>
+                    <div className="prose prose-indigo max-w-none text-gray-700">
+                      <ReactMarkdown>
+                        {parsedAdventureContent[index].activities}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="flex flex-col sm:flex-row sm:justify-between">
+                  {parsedAdventureContent[index].time && (
+                    <div className="mb-3 sm:mb-0 sm:w-1/2 sm:pr-2">
+                      <h5 className="text-sm font-medium text-indigo-600 mb-1">
+                        <i className="pi pi-clock mr-1"></i>
+                        Estimated Time
+                      </h5>
+                      <p className="text-gray-700">{parsedAdventureContent[index].time}</p>
+                    </div>
+                  )}
+                  
+                  {parsedAdventureContent[index].funFact && (
+                    <div className="sm:w-1/2 sm:pl-2">
+                      <h5 className="text-sm font-medium text-indigo-600 mb-1">
+                        <i className="pi pi-info-circle mr-1"></i>
+                        Fun Fact
+                      </h5>
+                      <p className="text-gray-700 italic">{parsedAdventureContent[index].funFact}</p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
             

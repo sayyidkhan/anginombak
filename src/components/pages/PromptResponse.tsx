@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from 'primereact/button';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { ProgressSpinner } from 'primereact/progressspinner';
+import ReactMarkdown from 'react-markdown';
 import Header from '../common/Header';
 import Footer from '../common/Footer';
+import { generateAdventureContent } from '../../services/GeminiService';
 import { 
   PAGE_TITLES, 
   FORM_LABELS
@@ -16,14 +19,17 @@ interface PromptData {
   duration: number;
   isPublic: boolean;
   username: string;
+  autoGenerate?: boolean;
 }
 
 const PromptResponse: React.FC = () => {
-  const [transportMode, setTransportMode] = useState<'Public' | 'Private'>('Public');
   const [promptData, setPromptData] = useState<PromptData | null>(null);
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState<number>(0);
+  const [transportMode, setTransportMode] = useState<'Public' | 'Private'>('Public');
   const [savedProgress, setSavedProgress] = useState(false);
   const [expandedSteps, setExpandedSteps] = useState<number[]>([]);
+  const [adventureContent, setAdventureContent] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -31,9 +37,14 @@ const PromptResponse: React.FC = () => {
   useEffect(() => {
     // Get data passed from Prompt component
     if (location.state) {
-      const data = location.state as PromptData;
+      const data = location.state as PromptData & { autoGenerate?: boolean };
       setPromptData(data);
       console.log('Received data:', data);
+      
+      // Auto-generate content if flag is set
+      if (data.autoGenerate) {
+        handleGenerateAdventure();
+      }
       
       // Try to load saved transport mode preference if user has a username
       if (data.username) {
@@ -184,7 +195,7 @@ const PromptResponse: React.FC = () => {
           <div className={`grid w-full gap-1`} style={{ gridTemplateColumns: `repeat(${steps.length}, 1fr)` }}>
             {steps.map((step, index) => (
               <div 
-                key={step} 
+                key={index} 
                 className="flex flex-col items-center cursor-pointer px-1"
                 onClick={() => toggleStepExpansion(index)}
               >
@@ -214,7 +225,7 @@ const PromptResponse: React.FC = () => {
         <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 min-h-[150px]">
           {steps.map((_, index) => (
             expandedSteps.includes(index) && (
-              <div key={`step-content-${index}`}>
+              <div key={index}>
                 {index === 0 ? (
                   <div>
                     <h3 className="text-lg font-medium text-gray-800 mb-2">Starting Point</h3>
@@ -313,6 +324,84 @@ const PromptResponse: React.FC = () => {
     navigate('/prompt');
   };
   
+  const handleGenerateAdventure = async () => {
+    try {
+      setGenerating(true);
+      
+      if (!promptData) {
+        console.error('No prompt data available');
+        return;
+      }
+      
+      const content = await generateAdventureContent(promptData);
+      setAdventureContent(content);
+      
+      // Parse the generated content to extract checkpoint information
+      const parseAdventureContent = (content: string | null | undefined) => {
+        if (!content) return { parsedContent: {}, checkpointCount: 0 };
+        
+        try {
+          // Initialize result object with a key for each checkpoint
+          const result: Record<number, any> = {};
+          
+          // Split content by checkpoint headings
+          // Look for patterns like "Checkpoint 1:", "Checkpoint 2:", etc.
+          const checkpointSections = content.split(/(?=\#\#\s*Checkpoint\s*\d+|Starting\s*Point|Final\s*Destination)/gi);
+          
+          // Process each section
+          checkpointSections.forEach((section, index) => {
+            // Extract title
+            const titleMatch = section.match(/(?:\#\#\s*)?(.*?)(?:\:|\n|$)/);
+            const title = titleMatch ? titleMatch[1].trim() : `Checkpoint ${index}`;
+            
+            // Extract location
+            const locationMatch = section.match(/(?:Location\s*\:?\s*)(.*?)(?:\n\s*\-|\n\s*\#|\n\s*Description|\n\s*Activities|\n\s*Estimated|\n\s*Fun Fact|$)/si);
+            const location = locationMatch ? locationMatch[1].trim() : `Location ${index}`;
+            
+            // Extract description
+            const descriptionMatch = section.match(/(?:Description\s*\:?\s*)(.*?)(?:\n\s*\-|\n\s*\#|\n\s*Activities|\n\s*Estimated|\n\s*Fun Fact|$)/si);
+            const description = descriptionMatch ? descriptionMatch[1].trim() : '';
+            
+            // Store in result
+            result[index] = {
+              title,
+              location,
+              description
+            };
+          });
+          
+          return { 
+            parsedContent: result, 
+            checkpointCount: Object.keys(result).length 
+          };
+        } catch (error) {
+          console.error('Error parsing adventure content:', error);
+          return { 
+            parsedContent: {}, 
+            checkpointCount: 0 
+          };
+        }
+      };
+      
+      // Parse the generated content
+      const parsedContent = parseAdventureContent(content);
+      
+      // Update the number of checkpoints based on the parsed content
+      if (promptData && parsedContent.checkpointCount > 0) {
+        setPromptData({
+          ...promptData,
+          checkpoints: parsedContent.checkpointCount
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error generating adventure content:', error);
+      setAdventureContent(null);
+    } finally {
+      setGenerating(false);
+    }
+  };
+  
   return (
     <div className="min-h-screen bg-blue-50 flex flex-col">
       <Header pageTitle={PAGE_TITLES.RESPONSE_PAGE_TITLE} />
@@ -382,8 +471,96 @@ const PromptResponse: React.FC = () => {
                   className="bg-green-500 hover:bg-green-600 text-white border-none"
                   onClick={() => {
                     if (window.confirm('Are you ready to start this journey?')) {
+                      // Parse the adventure content to extract checkpoint information
+                      const parseAdventureContent = (content: string | null | undefined) => {
+                        if (!content) return { parsedContent: {}, checkpointCount: 0 };
+                        
+                        try {
+                          // Initialize result object with a key for each checkpoint
+                          const result: Record<number, any> = {};
+                          
+                          // Split content by checkpoint headings
+                          const checkpointSections = content.split(/(?=\#\#\s*Checkpoint\s*\d+|Starting\s*Point|Final\s*Destination)/gi);
+                          
+                          // Process each section
+                          checkpointSections.forEach((section, index) => {
+                            // Extract title
+                            const titleMatch = section.match(/(?:\#\#\s*)?(.*?)(?:\:|\n|$)/);
+                            const title = titleMatch ? titleMatch[1].trim() : `Checkpoint ${index}`;
+                            
+                            // Extract location
+                            const locationMatch = section.match(/(?:Location\s*\:?\s*)(.*?)(?:\n\s*\-|\n\s*\#|\n\s*Description|\n\s*Activities|\n\s*Estimated|\n\s*Fun Fact|$)/si);
+                            const location = locationMatch ? locationMatch[1].trim() : `Location ${index}`;
+                            
+                            // Extract description
+                            const descriptionMatch = section.match(/(?:Description\s*\:?\s*)(.*?)(?:\n\s*\-|\n\s*\#|\n\s*Activities|\n\s*Estimated|\n\s*Fun Fact|$)/si);
+                            const description = descriptionMatch ? descriptionMatch[1].trim() : '';
+                            
+                            // Store in result
+                            result[index] = {
+                              title,
+                              location,
+                              description
+                            };
+                          });
+                          
+                          return { 
+                            parsedContent: result, 
+                            checkpointCount: Object.keys(result).length 
+                          };
+                        } catch (error) {
+                          console.error('Error parsing adventure content:', error);
+                          return { 
+                            parsedContent: {}, 
+                            checkpointCount: 0 
+                          };
+                        }
+                      };
+                      
+                      // Parse the generated content
+                      const { parsedContent } = parseAdventureContent(adventureContent);
+                      
+                      // Create checkpoints based on parsed content
+                      const checkpoints = Object.entries(parsedContent).map(([_, value]: [string, any], index) => {
+                        return {
+                          id: index + 1,
+                          title: value.title || `Checkpoint ${index}`,
+                          description: value.description || `Checkpoint ${index} of your journey.`,
+                          completed: false,
+                          timestamp: '',
+                          location: value.location || (index === 0 
+                            ? promptData?.startLocation?.name || 'Starting Point'
+                            : `Location ${index}`)
+                        };
+                      });
+                      
+                      // If no checkpoints were parsed, fall back to default checkpoints
+                      if (checkpoints.length === 0) {
+                        const steps = generateSteps();
+                        checkpoints.push(...steps.map((stepName, index) => {
+                          let description = '';
+                          if (index === 0) {
+                            description = `Begin your adventure here. ${promptData?.player1}`;
+                          } else if (index === steps.length - 1) {
+                            description = `Complete your journey. ${promptData?.player2}`;
+                          } else {
+                            description = `Checkpoint ${index} of your journey.`;
+                          }
+                          
+                          return {
+                            id: index + 1,
+                            title: stepName,
+                            description: description,
+                            completed: false,
+                            timestamp: '',
+                            location: index === 0 
+                              ? promptData?.startLocation?.name || 'Starting Point'
+                              : `Location ${index}`
+                          };
+                        }));
+                      }
+                      
                       // Create the adventure object
-                      const steps = generateSteps();
                       const adventure = {
                         id: `adventure_${Date.now()}`,
                         title: `${promptData?.player1} - ${promptData?.player2}`,
@@ -393,20 +570,8 @@ const PromptResponse: React.FC = () => {
                         estimatedDuration: promptData?.duration || 60,
                         progress: 0,
                         checkpoint_counter: 0,
-                        checkpoints: steps.map((stepName, index) => ({
-                          id: index + 1,
-                          title: stepName,
-                          description: index === 0 
-                            ? `Begin your adventure here. ${promptData?.player1}`
-                            : index === steps.length - 1
-                              ? `Complete your journey. ${promptData?.player2}`
-                              : `Checkpoint ${index} of your journey.`,
-                          completed: false,
-                          timestamp: '',
-                          location: index === 0 
-                            ? promptData?.startLocation?.name || 'Starting Point'
-                            : `Location ${index}`
-                        })),
+                        generatedContent: adventureContent || null,
+                        checkpoints: checkpoints,
                         startLocation: promptData?.startLocation || null
                       };
                       
@@ -446,6 +611,31 @@ const PromptResponse: React.FC = () => {
               <div className="mt-4 text-xs text-green-600 flex items-center justify-end">
                 <i className="pi pi-check-circle mr-1"></i>
                 Progress saved
+              </div>
+            )}
+            
+            {/* Generate adventure button */}
+            <Button
+              label="Generate Adventure"
+              icon="pi pi-play"
+              className="bg-orange-500 hover:bg-orange-600 text-white border-none mt-4"
+              onClick={handleGenerateAdventure}
+            />
+            
+            {/* Generating indicator */}
+            {generating && (
+              <div className="mt-4 flex justify-center">
+                <ProgressSpinner />
+              </div>
+            )}
+            
+            {/* Adventure content */}
+            {adventureContent && (
+              <div className="mt-4">
+                <h2 className="text-lg font-medium text-gray-800 mb-2">Adventure Content</h2>
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <ReactMarkdown>{adventureContent}</ReactMarkdown>
+                </div>
               </div>
             )}
           </div>

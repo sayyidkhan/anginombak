@@ -125,8 +125,54 @@ export const enhancePrompt = async (prompt: string): Promise<string> => {
     .trim();
 };
 
+/**
+ * Generate adventure content based on prompt data
+ * @param promptData Object containing all the prompt data (player1, player2, startLocation, etc.)
+ * @returns The generated adventure content
+ */
+export const generateAdventureContent = async (
+  promptData: {
+    player1: string;
+    player2: string;
+    startLocation: {lat: number, lng: number, name: string} | null;
+    checkpoints: number;
+    duration: number;
+    isPublic: boolean;
+  }
+): Promise<string> => {
+  try {
+    const systemPrompt = 
+      "You are Mr Ombak 🌊, an adventure planning assistant. Your task is to create a detailed adventure plan based on the following information:\n\n" +
+      "1. Player 1's interests and preferences\n" +
+      "2. Player 2's interests and preferences\n" +
+      "3. Starting location\n" +
+      "4. Number of checkpoints to visit\n" +
+      "5. Total duration of the adventure in minutes\n\n" +
+      "Create a detailed adventure plan with the exact number of checkpoints requested. For each checkpoint, provide:\n" +
+      "- A name and description of the location\n" +
+      "- Activities to do there that combine both players' interests\n" +
+      "- Estimated time to spend at the location\n" +
+      "- A fun fact or interesting detail about the place\n\n" +
+      "Format your response in a structured way with clear headings and sections. Be creative but practical, considering the total duration and starting location.";
+
+    const userPrompt = 
+      `Player 1 interests: ${promptData.player1}\n\n` +
+      `Player 2 interests: ${promptData.player2}\n\n` +
+      `Starting location: ${promptData.startLocation?.name || 'Not specified'} ` +
+      `(Coordinates: ${promptData.startLocation?.lat}, ${promptData.startLocation?.lng})\n\n` +
+      `Number of checkpoints: ${promptData.checkpoints}\n\n` +
+      `Total duration: ${promptData.duration} minutes`;
+
+    return generateContentWithSystemPrompt(systemPrompt, userPrompt);
+  } catch (error) {
+    console.error('Error generating adventure content:', error);
+    throw error;
+  }
+};
+
 export default {
   generateContent,
   generateContentWithSystemPrompt,
-  enhancePrompt
+  enhancePrompt,
+  generateAdventureContent
 };

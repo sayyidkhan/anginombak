@@ -113,6 +113,77 @@ const Marketplace: React.FC = () => {
   return (
     <MainLayout>
       <div className="container mx-auto">
+        {/* Points Tracking Card */}
+        <div className="mb-6 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl shadow-lg p-6 text-white">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">My Rewards Points</h2>
+              <div className="flex items-center">
+                <i className="pi pi-star-fill mr-2 text-yellow-300"></i>
+                <span className="text-4xl font-bold">500</span>
+                <span className="ml-2 text-yellow-200">points</span>
+              </div>
+              <p className="mt-2 text-sm text-yellow-100">
+                Complete adventures to earn more points!
+              </p>
+            </div>
+            <div className="bg-white bg-opacity-20 p-4 rounded-lg">
+              <h3 className="text-lg font-semibold mb-2">Points Value</h3>
+              <div className="flex items-center">
+                <span className="text-xl font-bold">100 points = 1 SGD</span>
+              </div>
+              <p className="mt-2 text-sm">
+                Current balance value: <span className="font-bold">5.00 SGD</span>
+              </p>
+              <Button 
+                label="Redeem Points" 
+                icon="pi pi-shopping-cart"
+                className="mt-3 bg-yellow-400 hover:bg-yellow-500 text-gray-800 border-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Points History Section */}
+        <div className="mb-6 bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Points History</h2>
+          <div className="overflow-hidden rounded-lg border border-gray-200">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activity</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Points</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-03-23</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Completed Adventure: East Coast Park</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">+200</td>
+                </tr>
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-03-20</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Completed Adventure: Gardens by the Bay</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">+150</td>
+                </tr>
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-03-15</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Completed Adventure: Sentosa Island</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">+150</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 flex justify-end">
+            <Button 
+              label="View All History" 
+              icon="pi pi-history"
+              className="bg-gray-500 hover:bg-gray-600 text-white border-none"
+            />
+          </div>
+        </div>
+
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-medium">Marketplace</h1>
           <div className="flex gap-2">

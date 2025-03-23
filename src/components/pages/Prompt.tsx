@@ -129,7 +129,7 @@ const Prompt = () => {
         duration,
         isPublic 
       });
-      // Navigate to prompt-response page
+      // Navigate to prompt-response page with a flag to auto-generate content
       navigate('/prompt-response', { 
         state: { 
           player1, 
@@ -138,7 +138,8 @@ const Prompt = () => {
           checkpoints, 
           duration,
           isPublic,
-          username: location.search.split('username=')[1] 
+          username: location.search.split('username=')[1],
+          autoGenerate: true // Add flag to auto-generate content
         } 
       });
     }
