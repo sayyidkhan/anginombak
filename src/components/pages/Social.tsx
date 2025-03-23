@@ -85,7 +85,7 @@ const Social: React.FC = () => {
       id: 1,
       user: {
         name: 'Aisyah',
-        avatar: 'https://via.placeholder.com/40',
+        avatar: ''
       },
       content: 'Just completed our first FamilyQuest! We had so much fun exploring Kampong Lorong Buangkok and learning about the local flora and fauna. Can\'t wait for our next adventure!',
       likes: 25,
@@ -97,7 +97,7 @@ const Social: React.FC = () => {
       id: 2,
       user: {
         name: 'Amir',
-        avatar: 'https://via.placeholder.com/40',
+        avatar: ''
       },
       content: 'Looking for a family-friendly activity this weekend? Anyone have recommendations for nature walks or parks with educational activities for kids?',
       likes: 8,
@@ -109,7 +109,7 @@ const Social: React.FC = () => {
       id: 3,
       user: {
         name: 'Adib',
-        avatar: 'https://via.placeholder.com/40'
+        avatar: ''
       },
       content: 'Check out our family adventure at East Coast Park!',
       likes: 42,
@@ -123,7 +123,7 @@ const Social: React.FC = () => {
   // Current logged-in user
   const currentUser = {
     name: 'Adib',
-    avatar: 'https://via.placeholder.com/40'
+    avatar: ''
   };
 
   // Simulate comments for a post
@@ -132,13 +132,13 @@ const Social: React.FC = () => {
       const simulatedComments: Comment[] = [
         {
           id: 1,
-          user: { name: 'Zainab', avatar: 'https://via.placeholder.com/40' },
+          user: { name: 'Zainab', avatar: '' },
           text: 'This looks amazing! Where exactly in East Coast Park was this?',
           timestamp: '2 hours ago'
         },
         {
           id: 2,
-          user: { name: 'Hakim', avatar: 'https://via.placeholder.com/40' },
+          user: { name: 'Hakim', avatar: '' },
           text: 'My kids would love this activity. Thanks for sharing!',
           timestamp: '5 hours ago'
         }
@@ -401,23 +401,23 @@ const Social: React.FC = () => {
         onHide: closeShareDialog,
         content: (
           <div className="flex flex-col gap-4 relative p-0">
-            <div className="absolute top-0 right-0 p-2">
+            {/* <div className="absolute top-0 right-0 p-2">
               <Button
                 icon="pi pi-times"
-                className="p-button-rounded p-button-text p-button-danger"
+                className="p-button-rounded p-button-text p-button-sm p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
                 onClick={closeShareDialog}
                 aria-label="Close"
                 style={{ fontSize: '1.2rem', width: '2rem', height: '2rem' }}
                 tabIndex={0}
               />
-            </div>
+            </div> */}
             <div className="flex flex-col gap-2 mt-4 w-fit mx-auto">
               {sharePlatforms.map(platform => (
                 <Button
                   key={platform.name}
                   icon={platform.icon}
                   label={platform.name}
-                  className="p-button-outlined w-full"
+                  className="p-button-outlined p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
                   onClick={() => {
                     if (toastRef.current) {
                       toastRef.current.show({
@@ -467,8 +467,8 @@ const Social: React.FC = () => {
             >
               <div className="flex items-center gap-3 mb-4">
                 <Avatar 
-                  image={post.user.avatar}
-                  className="w-10 h-10"
+                  icon="pi pi-user"
+                  className="w-10 h-10 bg-gray-200 text-gray-600"
                 />
                 <div className="flex-1">
                   <h3 className="font-medium">{post.user.name}</h3>
@@ -500,14 +500,14 @@ const Social: React.FC = () => {
                 <div className="flex items-center gap-4">
                   <Button 
                     icon="pi pi-heart" 
-                    className="p-button-text"
+                    className="p-button-text p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
                     onClick={() => handleLike(post.id)}
                   >
                     {post.likes}
                   </Button>
                   <Button 
                     icon="pi pi-comment" 
-                    className="p-button-text"
+                    className="p-button-text p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
                     onClick={() => setShowComments(showComments === post.id ? null : post.id)}
                   >
                     {post.comments}
@@ -515,7 +515,7 @@ const Social: React.FC = () => {
                   {post.user.name === currentUser.name && (
                     <Button 
                       icon="pi pi-share-alt" 
-                      className="p-button-text"
+                      className="p-button-text p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
                       onClick={() => handleShare(post.id)}
                       tooltip="Share this post"
                       tooltipOptions={{ position: 'top' }}
@@ -531,8 +531,8 @@ const Social: React.FC = () => {
                     {activePostComments.map(comment => (
                       <div key={comment.id} className="flex gap-2 group">
                         <Avatar 
-                          image={comment.user.avatar}
-                          className="w-8 h-8"
+                          icon="pi pi-user"
+                          className="w-8 h-8 bg-gray-200 text-gray-600"
                         />
                         <div className="flex-1">
                           {comment.isEditing ? (
@@ -547,12 +547,12 @@ const Social: React.FC = () => {
                               <div className="flex gap-2 justify-end">
                                 <Button
                                   label="Cancel"
-                                  className="p-button-text p-button-sm"
+                                  className="p-button-text p-button-sm p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
                                   onClick={cancelEditComment}
                                 />
                                 <Button
                                   label="Save"
-                                  className="p-button-sm"
+                                  className="p-button-sm p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
                                   onClick={() => saveEditComment(comment.id)}
                                   disabled={!editCommentText.trim()}
                                 />
@@ -568,7 +568,7 @@ const Social: React.FC = () => {
                                   <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <Button
                                       icon="pi pi-ellipsis-h"
-                                      className="p-button-text p-button-rounded p-button-sm"
+                                      className="p-button-text p-button-rounded p-button-sm p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
                                       onClick={(e) => {
                                         if (commentMenuRef.current) {
                                           commentMenuRef.current.toggle(e);
@@ -623,6 +623,7 @@ const Social: React.FC = () => {
                     />
                     <Button 
                       icon="pi pi-send"
+                      className="p-button-text p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
                       onClick={() => handleAddComment(post.id)}
                       disabled={!commentText.trim()}
                     />
@@ -681,7 +682,7 @@ const Social: React.FC = () => {
                 />
                 <Button
                   icon="pi pi-times"
-                  className="p-button-rounded p-button-danger p-button-sm absolute top-2 right-2"
+                  className="p-button-rounded p-button-text p-button-sm p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
                   onClick={() => {
                     if (videoPreviewUrl) {
                       URL.revokeObjectURL(videoPreviewUrl);
@@ -751,7 +752,7 @@ const Social: React.FC = () => {
             <div className="flex justify-end gap-2">
               <Button
                 label="Cancel"
-                className="p-button-outlined"
+                className="p-button-outlined p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
                 onClick={() => {
                   if (!isUploading) {
                     setShowReelDialog(false);
@@ -769,6 +770,7 @@ const Social: React.FC = () => {
               <Button
                 label={isUploading ? "Uploading..." : "Upload"}
                 icon="pi pi-upload"
+                className="p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
                 onClick={handleReelUpload}
                 disabled={!selectedVideo || !caption.trim() || isUploading}
                 loading={isUploading}

@@ -15,8 +15,14 @@ const Footer: React.FC = () => {
             <Link to="/prompt" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
               Create Adventure
             </Link>
-            <Link to="/explore" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
-              Explore
+            <Link to="/home" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
+              Home
+            </Link>
+            <Link to="/marketplace" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
+              Marketplace
+            </Link>
+            <Link to="/social" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
+              Social
             </Link>
             <Link to="/login" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
               Account

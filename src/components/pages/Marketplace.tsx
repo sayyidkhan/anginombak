@@ -122,12 +122,18 @@ const Marketplace: React.FC = () => {
             <Button
               label="Filter"
               icon="pi pi-filter"
-              className="p-button-outlined"
+              className="p-button-outlined bg-indigo-500 text-white hover:bg-indigo-600"
             />
             <Button
               label="Sort"
               icon="pi pi-sort"
-              className="p-button-outlined"
+              className="p-button-outlined bg-indigo-500 text-white hover:bg-indigo-600"
+            />
+            <Button
+              label="Social"
+              icon="pi pi-users"
+              className="p-button-outlined bg-indigo-500 text-white hover:bg-indigo-600"
+              onClick={() => window.location.href = '/social'}
             />
           </div>
         </div>
@@ -159,7 +165,7 @@ const Marketplace: React.FC = () => {
                     <span className="text-lg font-semibold">{vendor.price}</span>
                     <Button 
                       label="Learn More"
-                      className="p-button-outlined"
+                      className="p-button-outlined bg-indigo-500 text-white hover:bg-indigo-600"
                     />
                   </div>
                 </div>
