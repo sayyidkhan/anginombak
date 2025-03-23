@@ -11,7 +11,8 @@ const Footer: React.FC = () => {
             <p className="text-sm opacity-80">&copy; 2025 {APP_NAME}. All rights reserved.</p>
             <p className="text-xs opacity-60 mt-1">Version 1.0.0</p>
           </div>
-          <div className="flex gap-6">
+          {/* Mobile: vertical, Desktop: horizontal */}
+          <div className="flex flex-col md:flex-row md:gap-6 items-center md:items-start gap-3">
             <Link to="/prompt" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
               Create Adventure
             </Link>

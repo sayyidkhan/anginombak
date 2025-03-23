@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import LocationMap from '../common/LocationMap';
 import Header from '../common/Header';
 import Footer from '../common/Footer';
+import AiChat from '../common/AiChat';
 import { 
   PAGE_TITLES, 
   FORM_LABELS, 
@@ -430,6 +431,11 @@ const Prompt = () => {
       </main>
       
       <Footer />
+      
+      {/* Add AI Chat assistant */}
+      <div className="fixed bottom-0 right-0 m-4 z-50">
+        <AiChat />
+      </div>
     </div>
   );
 };

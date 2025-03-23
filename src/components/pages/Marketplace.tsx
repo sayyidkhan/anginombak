@@ -1,8 +1,7 @@
 import React from 'react';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
-import Header from '../common/Header';
-import Footer from '../common/Footer';
+import MainLayout from '../layout/MainLayout';
 import './Marketplace.css';
 
 // Import images
@@ -112,10 +111,8 @@ const vendors: Vendor[] = [
 
 const Marketplace: React.FC = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-blue-50">
-      <Header />
-      
-      <main className="flex-1 p-4">
+    <MainLayout>
+      <div className="container mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-medium">Marketplace</h1>
           <div className="flex gap-2">
@@ -173,10 +170,8 @@ const Marketplace: React.FC = () => {
             </Card>
           ))}
         </div>
-      </main>
-
-      <Footer />
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 
