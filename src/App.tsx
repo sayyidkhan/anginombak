@@ -1,6 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 
+// PrimeReact imports
+import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
+
 import PromptResponse from './components/pages/PromptResponse'
 import MainPage from './components/MainPage'
 import Parenting from './components/Parenting'
@@ -10,6 +15,8 @@ import './App.css'
 import Login from './components/pages/Login'
 import Home from './components/pages/Home'
 import Explore from './components/pages/Explore'
+import Social from './components/pages/Social'
+import Marketplace from './components/pages/Marketplace'
 
 function App() {
   const [savedUsername, setSavedUsername] = useState<string | null>(null);
@@ -48,6 +55,8 @@ function App() {
         <Route path="/prompt" element={<Prompt />} />
         <Route path="/home" element={<Home />} />
         <Route path="/explore" element={<Explore />} />
+        <Route path="/social" element={<Social />} />
+        <Route path="/marketplace" element={<Marketplace />} />
         <Route path="/" element={<HomeRedirect />} />
       </Routes>
     </BrowserRouter>
