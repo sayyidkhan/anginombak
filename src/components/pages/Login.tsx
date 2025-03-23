@@ -71,8 +71,8 @@ const Login = () => {
                   console.log('Username saved to localStorage');
                 }
                 
-                // Navigate to the explore page instead of prompt
-                navigate('/explore');
+                // Navigate to the home page after login
+                navigate('/home');
               }
             }}
           />
