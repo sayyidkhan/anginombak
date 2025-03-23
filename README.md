@@ -87,6 +87,13 @@ AnginOmbak is a location-based application that helps users find and select loca
   - Grey button styling for Social page
   - Indigo button styling for Marketplace
 
+- **AI Assistant**
+  - Interactive chat assistant "Mr Ombak " available throughout the application
+  - Powered by Google's Gemini AI API
+  - Provides help with adventure planning and application usage
+  - Accessible via a floating button in the bottom-right corner
+  - Responsive design with proper mobile support
+
 ### Google Places API Integration
 
 The application uses Google Places API for location search and suggestions. To use this feature:
@@ -109,6 +116,25 @@ The application will use Google Places API for:
 
 If the Google Maps API is not available, the application will fall back to OpenStreetMap's Nominatim service.
 
+### Gemini AI Integration
+
+The application integrates Google's Gemini AI to provide an interactive assistant. To use this feature:
+
+1. Get a Gemini API key from the [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Add your API key to the `.env` file:
+   ```
+   VITE_GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+   ```
+3. Restart the development server
+
+The AI assistant provides:
+- Contextual help with adventure planning
+- Information about application features
+- Personalized recommendations
+- Natural language interaction
+
+If the Gemini API key is not configured, the AI assistant will not be available.
+
 ## Deployment on Vercel
 
 This application is configured for seamless deployment on Vercel. Follow these steps to deploy:
@@ -126,6 +152,7 @@ This application is configured for seamless deployment on Vercel. Follow these s
    - Install Command: `npm install`
 6. Add environment variables (if needed):
    - Add your `VITE_GOOGLE_MAPS_API_KEY` if you're using Google Maps
+   - Add your `VITE_GEMINI_API_KEY` if you're using Gemini AI
 7. Click "Deploy"
 
 ### Option 2: Deploy using Vercel CLI
@@ -158,7 +185,7 @@ If your application uses environment variables:
 
 1. Go to your project in the Vercel dashboard
 2. Navigate to "Settings" > "Environment Variables"
-3. Add your environment variables (e.g., `VITE_GOOGLE_MAPS_API_KEY`)
+3. Add your environment variables (e.g., `VITE_GOOGLE_MAPS_API_KEY`, `VITE_GEMINI_API_KEY`)
 4. Redeploy your application for the changes to take effect
 
 ### CORS Configuration
