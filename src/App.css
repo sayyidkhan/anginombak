@@ -155,3 +155,68 @@ button.narrow-button,
     width: 100px !important;
   }
 }
+
+/* Custom toast message styling */
+.p-toast-message.p-toast-message-info.p-toast-message-enter-done,
+.p-toast .p-toast-message {
+  width: 200px !important;
+  max-width: 200px !important;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Create a header for the toast message */
+.p-toast .p-toast-message .p-toast-message-content {
+  padding: 0.5rem;
+  padding-top: 2rem; /* Increased padding to make room for the header */
+}
+
+/* Style the header area */
+.p-toast .p-toast-message:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.5rem;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 4px 4px 0 0;
+  z-index: 1;
+}
+
+/* Position the close button in the header */
+.p-toast .p-toast-message .p-toast-icon-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 0.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: #495057;
+}
+
+/* Hover effect for the close button */
+.p-toast .p-toast-message .p-toast-icon-close:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+
+/* Make sure the toast content doesn't overflow */
+.p-toast .p-toast-message .p-toast-detail {
+  word-break: break-word;
+}
+
+/* Custom class for our toast */
+.custom-toast .p-toast-message-content {
+  position: relative;
+}
