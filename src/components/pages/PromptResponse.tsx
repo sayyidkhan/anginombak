@@ -23,6 +23,7 @@ const PromptResponse: React.FC = () => {
   const [promptData, setPromptData] = useState<PromptData | null>(null);
   const [activeStep, setActiveStep] = useState(0);
   const [savedProgress, setSavedProgress] = useState(false);
+  const [expandedSteps, setExpandedSteps] = useState<number[]>([]);
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -49,12 +50,22 @@ const PromptResponse: React.FC = () => {
             const step = parseInt(savedStep, 10);
             if (!isNaN(step) && step >= 0 && step <= data.checkpoints) {
               setActiveStep(step);
+              // Initialize expanded steps with only the active one
+              setExpandedSteps([step]);
               console.log('Loaded saved active step:', step);
             }
+          } else {
+            // If no saved step, initialize expanded steps with step 0
+            setExpandedSteps([0]);
           }
         } catch (error) {
           console.error('Error loading saved preferences:', error);
+          // Initialize expanded steps with step 0 if there's an error
+          setExpandedSteps([0]);
         }
+      } else {
+        // Initialize expanded steps with step 0 if no username
+        setExpandedSteps([0]);
       }
     } else {
       // If no data is passed, redirect to prompt page
@@ -93,6 +104,19 @@ const PromptResponse: React.FC = () => {
       }
     }
   }, [transportMode, activeStep, promptData?.username]);
+  
+  // Toggle step expansion
+  const toggleStepExpansion = (index: number) => {
+    setActiveStep(index);
+    
+    // When clicking on a step, make it the only expanded one
+    setExpandedSteps([index]);
+    
+    // Save active step if user has a username
+    if (promptData?.username) {
+      localStorage.setItem(`anginombak_activeStep_${promptData.username}`, index.toString());
+    }
+  };
   
   // Format location name for display
   const getLocationName = () => {
@@ -162,7 +186,7 @@ const PromptResponse: React.FC = () => {
               <div 
                 key={step} 
                 className="flex flex-col items-center cursor-pointer px-1"
-                onClick={() => setActiveStep(index)}
+                onClick={() => toggleStepExpansion(index)}
               >
                 {/* Circle indicator */}
                 <div 
@@ -188,81 +212,101 @@ const PromptResponse: React.FC = () => {
         
         {/* Step content */}
         <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 min-h-[150px]">
-          {activeStep === 0 ? (
-            <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-2">Starting Point</h3>
-              <p className="text-gray-700">{getLocationName()}</p>
-              <p className="text-sm text-gray-500 mt-2">
-                Your adventure begins here! Get ready to explore and discover.
-              </p>
-              <p className="text-sm text-gray-500 mt-2">
-                {getTransportMessage()}
-              </p>
-              {promptData && (
-                <div className="mt-4 p-3 bg-indigo-50 rounded-lg">
-                  <p className="text-sm text-indigo-700">
-                    <span className="font-medium">Adventure Details:</span> {promptData.player1} and {promptData.player2}
-                  </p>
-                  <p className="text-sm text-indigo-700 mt-1">
-                    <span className="font-medium">Duration:</span> {promptData.duration} minutes
-                  </p>
-                  <p className="text-sm text-indigo-700 mt-1">
-                    <span className="font-medium">Total Checkpoints:</span> {promptData.checkpoints}
-                  </p>
-                </div>
-              )}
-            </div>
-          ) : activeStep === generateSteps().length - 1 ? (
-            <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-2">Final Destination</h3>
-              <p className="text-gray-700">
-                Congratulations! You've reached your final destination.
-              </p>
-              <div className="mt-4 bg-green-50 p-4 rounded-lg">
-                <div className="flex items-center justify-center">
-                  <i className="pi pi-check-circle text-green-500 text-xl mr-2"></i>
-                  <h4 className="text-green-700 font-medium text-center">Adventure Created!</h4>
-                </div>
-                <p className="text-green-600 mt-2 text-center">
-                  You've successfully completed all checkpoints and reached your destination. 
-                  Well done on completing this adventure!
-                </p>
-                {promptData && (
-                  <div className="mt-3 text-sm text-green-700 text-center">
-                    <p>You've experienced an amazing journey focused on {promptData.player1} and {promptData.player2}.</p>
-                    <p className="mt-1">Total journey time: approximately {promptData.duration} minutes.</p>
+          {steps.map((_, index) => (
+            expandedSteps.includes(index) && (
+              <div key={`step-content-${index}`}>
+                {index === 0 ? (
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-800 mb-2">Starting Point</h3>
+                    <p className="text-gray-700">{getLocationName()}</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Your adventure begins here! Get ready to explore and discover.
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      {getTransportMessage()}
+                    </p>
+                    {promptData && (
+                      <div className="mt-4 p-3 bg-indigo-50 rounded-lg">
+                        <p className="text-sm text-indigo-700">
+                          <span className="font-medium">Adventure Details:</span> {promptData.player1} and {promptData.player2}
+                        </p>
+                        <p className="text-sm text-indigo-700 mt-1">
+                          <span className="font-medium">Duration:</span> {promptData.duration} minutes
+                        </p>
+                        <p className="text-sm text-indigo-700 mt-1">
+                          <span className="font-medium">Total Checkpoints:</span> {promptData.checkpoints}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : index === steps.length - 1 ? (
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-800 mb-2">Final Destination</h3>
+                    <p className="text-gray-700">
+                      Congratulations! You've reached your final destination.
+                    </p>
+                    <div className="mt-4 bg-green-50 p-4 rounded-lg">
+                      <div className="flex items-center justify-center">
+                        <i className="pi pi-check-circle text-green-500 text-xl mr-2"></i>
+                        <h4 className="text-green-700 font-medium text-center">Adventure Created!</h4>
+                      </div>
+                      <p className="text-green-600 mt-2 text-center">
+                        You've successfully completed all checkpoints and reached your destination. 
+                        Well done on completing this adventure!
+                      </p>
+                      {promptData && (
+                        <div className="mt-3 text-sm text-green-700 text-center">
+                          <p>You've experienced an amazing journey focused on {promptData.player1} and {promptData.player2}.</p>
+                          <p className="mt-1">Total journey time: approximately {promptData.duration} minutes.</p>
+                        </div>
+                      )}
+                      <div className="mt-4 flex justify-center">
+                        {/* Removed the Start This Journey button from here since it's now in the navigation buttons */}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-800 mb-2">Checkpoint {index}</h3>
+                    <p className="text-gray-700">
+                      Estimated time to reach: {getEstimatedTime()} minutes
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Complete the challenges at this checkpoint to continue your journey.
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      {getTransportMessage()}
+                    </p>
                   </div>
                 )}
-                <div className="mt-4 flex justify-center">
-                  {/* Removed the Start This Journey button from here since it's now in the navigation buttons */}
-                </div>
               </div>
-            </div>
-          ) : (
-            <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-2">Checkpoint {activeStep}</h3>
-              <p className="text-gray-700">
-                Estimated time to reach: {getEstimatedTime()} minutes
-              </p>
-              <p className="text-sm text-gray-500 mt-2">
-                Complete the challenges at this checkpoint to continue your journey.
-              </p>
-              <p className="text-sm text-gray-500 mt-2">
-                {getTransportMessage()}
-              </p>
-            </div>
-          )}
+            )
+          ))}
         </div>
       </div>
     );
   };
   
   const handlePrevious = () => {
-    setActiveStep(prev => Math.max(0, prev - 1));
+    const prevStep = Math.max(0, activeStep - 1);
+    setActiveStep(prevStep);
+    setExpandedSteps([prevStep]);
+    
+    // Save active step if user has a username
+    if (promptData?.username) {
+      localStorage.setItem(`anginombak_activeStep_${promptData.username}`, prevStep.toString());
+    }
   };
   
   const handleNext = () => {
-    setActiveStep(prev => Math.min(generateSteps().length - 1, prev + 1));
+    const nextStep = Math.min(generateSteps().length - 1, activeStep + 1);
+    setActiveStep(nextStep);
+    setExpandedSteps([nextStep]);
+    
+    // Save active step if user has a username
+    if (promptData?.username) {
+      localStorage.setItem(`anginombak_activeStep_${promptData.username}`, nextStep.toString());
+    }
   };
   
   const handleBackToPrompt = () => {
@@ -338,8 +382,51 @@ const PromptResponse: React.FC = () => {
                   className="bg-green-500 hover:bg-green-600 text-white border-none"
                   onClick={() => {
                     if (window.confirm('Are you ready to start this journey?')) {
-                      // Here you would typically trigger the start of the actual journey
-                      alert('Your journey has begun! Good luck on your adventure!');
+                      // Create the adventure object
+                      const steps = generateSteps();
+                      const adventure = {
+                        id: `adventure_${Date.now()}`,
+                        title: `${promptData?.player1} - ${promptData?.player2}`,
+                        description: `${promptData?.player1} ${promptData?.player2}`,
+                        transportMode: transportMode,
+                        startTime: new Date().toISOString(),
+                        estimatedDuration: promptData?.duration || 60,
+                        progress: 0,
+                        checkpoint_counter: 0,
+                        checkpoints: steps.map((stepName, index) => ({
+                          id: index + 1,
+                          title: stepName,
+                          description: index === 0 
+                            ? `Begin your adventure here. ${promptData?.player1}`
+                            : index === steps.length - 1
+                              ? `Complete your journey. ${promptData?.player2}`
+                              : `Checkpoint ${index} of your journey.`,
+                          completed: false,
+                          timestamp: '',
+                          location: index === 0 
+                            ? promptData?.startLocation?.name || 'Starting Point'
+                            : `Location ${index}`
+                        })),
+                        startLocation: promptData?.startLocation || null
+                      };
+                      
+                      // Store the adventure in local storage
+                      try {
+                        // Get existing adventures or initialize empty array
+                        const existingAdventures = JSON.parse(localStorage.getItem('anginombak_adventures') || '[]');
+                        
+                        // Add new adventure
+                        existingAdventures.push(adventure);
+                        
+                        // Save back to local storage
+                        localStorage.setItem('anginombak_adventures', JSON.stringify(existingAdventures));
+                        
+                        // Navigate to the explore page with the new adventure ID
+                        navigate('/explore', { state: { adventureId: adventure.id } });
+                      } catch (error) {
+                        console.error('Error saving adventure:', error);
+                        alert('There was an error saving your adventure. Please try again.');
+                      }
                     }
                   }}
                 />
