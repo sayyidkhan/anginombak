@@ -806,7 +806,7 @@ const Explore: React.FC = () => {
   };
   
   // Custom step marker renderer
-  const renderStepMarker = (item: CheckpointData, index: number, isActive: boolean) => {
+  const renderStepMarker = (item: CheckpointData, _index: number, isActive: boolean) => {
     return (
       <span className={`flex items-center justify-center w-8 h-8 rounded-full ${
         item.completed ? 'bg-green-500 text-white' : 
