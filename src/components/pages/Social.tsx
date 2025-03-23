@@ -10,8 +10,7 @@ import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 import { Menu } from 'primereact/menu';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import Header from '../common/Header';
-import Footer from '../common/Footer';
+import MainLayout from '../layout/MainLayout';
 
 interface User {
   name: string;
@@ -451,10 +450,9 @@ const Social: React.FC = () => {
   }, [videoPreviewUrl]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-blue-50">
+    <MainLayout>
       <Toast ref={toastRef} {...customToastOptions} />
       <ConfirmDialog />
-      <Header />
       
       <main className="flex-1 p-4">
         <div className="flex justify-between items-center mb-6">
@@ -691,11 +689,12 @@ const Social: React.FC = () => {
                 <video 
                   src={videoPreviewUrl} 
                   controls 
-                  className="w-full h-auto max-h-80 object-cover"
+                  className="w-full aspect-video"
+                  style={{ height: '300px' }}
                 />
                 <Button
                   icon="pi pi-times"
-                  className="p-button-rounded p-button-text p-button-sm p-button-secondary text-gray-500 bg-gray-100 hover:bg-gray-200"
+                  className="p-button-rounded p-button-text p-button-sm absolute top-2 right-2 bg-gray-200 text-gray-700"
                   onClick={() => {
                     if (videoPreviewUrl) {
                       URL.revokeObjectURL(videoPreviewUrl);
@@ -793,8 +792,10 @@ const Social: React.FC = () => {
         </Dialog>
       </main>
 
-      <Footer />
-    </div>
+      <div className="fixed bottom-0 right-0 m-4">
+        {/* <AiChat /> */}
+      </div>
+    </MainLayout>
   );
 };
 

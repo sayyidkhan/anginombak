@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from 'primereact/button';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { 
   APP_NAME, 
   BUTTON_LABELS,
   APP_DESCRIPTION
 } from '../../utils/constants';
-import windsurfIcon from '../../assets/windsurf.svg';
+import MainLayout from '../layout/MainLayout';
 
 const Explore: React.FC = () => {
   const [username, setUsername] = useState<string | null>(null);
@@ -145,40 +145,16 @@ const Explore: React.FC = () => {
   };
   
   return (
-    <div className="min-h-screen bg-blue-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center mb-4 md:mb-0">
-              <img src={windsurfIcon} alt="Windsurf" className="w-10 h-10 mr-3" />
-              <div>
-                <h1 className="text-2xl font-bold">{APP_NAME}</h1>
-                <p className="text-sm opacity-90">Embark on Your Next Great Adventure!</p>
-              </div>
-            </div>
-            <div className="flex items-center">
-              {username ? (
-                <div className="flex items-center">
-                  <span className="text-white mr-4">Welcome, {username}</span>
-                  <Link to="/login" className="text-white opacity-80 hover:opacity-100 transition-opacity">
-                    <i className="pi pi-sign-out mr-1"></i>
-                    Sign Out
-                  </Link>
-                </div>
-              ) : (
-                <Link to="/login" className="text-white opacity-80 hover:opacity-100 transition-opacity">
-                  <i className="pi pi-sign-in mr-1"></i>
-                  Sign In
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-      
+    <MainLayout>
       {/* Main Content */}
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
+        {/* User Welcome */}
+        {username && (
+          <div className="mb-4 bg-white rounded-lg shadow-sm p-4">
+            <h2 className="text-xl font-medium">Welcome, {username}!</h2>
+          </div>
+        )}
+        
         {/* Welcome Section */}
         <section className="mb-10">
           <div className="bg-white rounded-xl shadow-md p-6 mb-8">
@@ -291,37 +267,8 @@ const Explore: React.FC = () => {
             </div>
           )}
         </section>
-      </main>
-      
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-6">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <p className="text-sm opacity-80">&copy; 2025 {APP_NAME}. All rights reserved.</p>
-              <p className="text-xs opacity-60 mt-1">Version 1.0.0</p>
-            </div>
-            <div className="flex gap-6">
-              <Link to="/prompt" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
-                Create Adventure
-              </Link>
-              <Link to="/marketplace" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
-                Marketplace
-              </Link>
-              <Link to="/social" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
-                Social
-              </Link>
-              <Link to="/login" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
-                Account
-              </Link>
-              <a href="#" className="text-sm text-white opacity-80 hover:opacity-100 transition-opacity">
-                Help
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 
