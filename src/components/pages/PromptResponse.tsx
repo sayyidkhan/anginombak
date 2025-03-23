@@ -382,8 +382,51 @@ const PromptResponse: React.FC = () => {
                   className="bg-green-500 hover:bg-green-600 text-white border-none"
                   onClick={() => {
                     if (window.confirm('Are you ready to start this journey?')) {
-                      // Here you would typically trigger the start of the actual journey
-                      alert('Your journey has begun! Good luck on your adventure!');
+                      // Create the adventure object
+                      const steps = generateSteps();
+                      const adventure = {
+                        id: `adventure_${Date.now()}`,
+                        title: `${promptData?.player1} - ${promptData?.player2}`,
+                        description: `${promptData?.player1} ${promptData?.player2}`,
+                        transportMode: transportMode,
+                        startTime: new Date().toISOString(),
+                        estimatedDuration: promptData?.duration || 60,
+                        progress: 0,
+                        checkpoint_counter: 0,
+                        checkpoints: steps.map((stepName, index) => ({
+                          id: index + 1,
+                          title: stepName,
+                          description: index === 0 
+                            ? `Begin your adventure here. ${promptData?.player1}`
+                            : index === steps.length - 1
+                              ? `Complete your journey. ${promptData?.player2}`
+                              : `Checkpoint ${index} of your journey.`,
+                          completed: false,
+                          timestamp: '',
+                          location: index === 0 
+                            ? promptData?.startLocation?.name || 'Starting Point'
+                            : `Location ${index}`
+                        })),
+                        startLocation: promptData?.startLocation || null
+                      };
+                      
+                      // Store the adventure in local storage
+                      try {
+                        // Get existing adventures or initialize empty array
+                        const existingAdventures = JSON.parse(localStorage.getItem('anginombak_adventures') || '[]');
+                        
+                        // Add new adventure
+                        existingAdventures.push(adventure);
+                        
+                        // Save back to local storage
+                        localStorage.setItem('anginombak_adventures', JSON.stringify(existingAdventures));
+                        
+                        // Navigate to the explore page with the new adventure ID
+                        navigate('/explore', { state: { adventureId: adventure.id } });
+                      } catch (error) {
+                        console.error('Error saving adventure:', error);
+                        alert('There was an error saving your adventure. Please try again.');
+                      }
                     }
                   }}
                 />

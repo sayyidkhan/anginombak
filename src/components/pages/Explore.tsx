@@ -54,10 +54,10 @@ const Explore: React.FC = () => {
   useEffect(() => {
     const loadAdventure = async () => {
       try {
-        // In a real app, you would fetch this data from an API
-        // For now, we'll simulate loading data from localStorage
-        const queryParams = new URLSearchParams(location.search);
-        const adventureId = queryParams.get('id');
+        setLoading(true);
+        
+        // Check if we have an adventureId in the location state (from PromptResponse page)
+        const adventureId = location.state?.adventureId || new URLSearchParams(location.search).get('id');
         
         if (!adventureId) {
           console.error('No adventure ID provided');
@@ -68,65 +68,74 @@ const Explore: React.FC = () => {
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Mock data for the current adventure
-        const mockAdventure: AdventureData = {
-          id: adventureId,
-          title: 'Financial Adventure in the City',
-          theme: 'Financial Literacy',
-          startLocation: {
-            lat: 1.3521,
-            lng: 103.8198,
-            name: 'Singapore Downtown'
-          },
-          checkpoints: [
-            {
-              id: 1,
-              title: 'Starting Point',
-              description: 'Begin your adventure here. Learn about financial planning basics.',
-              completed: false,
-              timestamp: '',
-              location: 'Financial District'
-            },
-            {
-              id: 2,
-              title: 'Checkpoint 1',
-              description: 'Visit the bank to understand savings accounts and interest rates.',
-              completed: false,
-              timestamp: '',
-              location: 'Local Bank Branch'
-            },
-            {
-              id: 3,
-              title: 'Checkpoint 2',
-              description: 'Explore the park while learning about investment options.',
-              completed: false,
-              timestamp: '',
-              location: 'Central Park'
-            },
-            {
-              id: 4,
-              title: 'Final Destination',
-              description: 'Complete your financial literacy journey at the community center.',
-              completed: false,
-              timestamp: '',
-              location: 'Community Center'
-            }
-          ],
-          transportMode: 'Public',
-          startTime: new Date(Date.now() - 60 * 60000).toISOString(), // 1 hour ago
-          estimatedDuration: 120, // 2 hours
-          progress: 0, // 0% complete
-          checkpoint_counter: 0 // Start at the first checkpoint (Starting Point)
-        };
+        // Try to load adventure from local storage
+        const storedAdventures = JSON.parse(localStorage.getItem('anginombak_adventures') || '[]');
+        const foundAdventure = storedAdventures.find((adv: any) => adv.id === adventureId);
         
-        setAdventure(mockAdventure);
-        
-        // Set active checkpoint to the first one (Starting Point)
-        const initialActiveIndex = 0;
-        setActiveCheckpoint(initialActiveIndex);
-        
-        // Initialize expanded checkpoints with only the active one
-        setExpandedCheckpoints([initialActiveIndex]);
+        if (foundAdventure) {
+          console.log('Loaded adventure from local storage:', foundAdventure);
+          setAdventure(foundAdventure);
+          setActiveCheckpoint(foundAdventure.checkpoint_counter || 0);
+          setExpandedCheckpoints([foundAdventure.checkpoint_counter || 0]);
+        } else {
+          // Fall back to mock data if not found in local storage
+          console.log('Adventure not found in local storage, using mock data');
+          
+          // Mock data for the current adventure
+          const mockAdventure: AdventureData = {
+            id: adventureId,
+            title: 'Financial Adventure in the City',
+            theme: 'Financial Literacy',
+            startLocation: {
+              lat: 1.3521,
+              lng: 103.8198,
+              name: 'Singapore Downtown'
+            },
+            checkpoints: [
+              {
+                id: 1,
+                title: 'Starting Point',
+                description: 'Begin your adventure here. Learn about financial planning basics.',
+                completed: false,
+                timestamp: '',
+                location: 'Financial District'
+              },
+              {
+                id: 2,
+                title: 'Checkpoint 1',
+                description: 'Visit the bank to understand savings accounts and interest rates.',
+                completed: false,
+                timestamp: '',
+                location: 'Local Bank Branch'
+              },
+              {
+                id: 3,
+                title: 'Checkpoint 2',
+                description: 'Explore the park while learning about investment options.',
+                completed: false,
+                timestamp: '',
+                location: 'Central Park'
+              },
+              {
+                id: 4,
+                title: 'Final Destination',
+                description: 'Complete your financial literacy journey at the community center.',
+                completed: false,
+                timestamp: '',
+                location: 'Community Center'
+              }
+            ],
+            transportMode: 'Public',
+            startTime: new Date(Date.now() - 60 * 60000).toISOString(), // 1 hour ago
+            estimatedDuration: 120, // 2 hours
+            progress: 0, // 0% complete
+            checkpoint_counter: 0 // Start at the first checkpoint (Starting Point)
+          };
+          
+          setAdventure(mockAdventure);
+          setActiveCheckpoint(0);
+          setExpandedCheckpoints([0]);
+        }
         
         setLoading(false);
       } catch (error) {

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Slider } from 'primereact/slider';
 import LocationMap from '../common/LocationMap';
 import Header from '../common/Header';
 import Footer from '../common/Footer';
@@ -307,33 +306,26 @@ const Prompt = () => {
               <label className="text-gray-700 font-medium">{FORM_LABELS.DURATION}</label>
               <span className="text-indigo-600 font-medium">{formatDuration(duration)}</span>
             </div>
-            <div className="px-2 py-6">
-              <div className="custom-slider-container">
-                <Slider 
-                  value={duration} 
-                  onChange={(e) => setDuration(e.value as number)} 
-                  min={30} 
-                  max={120} 
-                  step={5}
-                  className="w-full custom-slider"
-                />
-              </div>
-              
-              {/* Tick marks with improved visibility */}
-              <div className="flex justify-between mt-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-1 h-3 bg-indigo-400 rounded-full"></div>
-                  <span className="text-xs text-gray-600 mt-1">30 min</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="w-1 h-3 bg-indigo-400 rounded-full"></div>
-                  <span className="text-xs text-gray-600 mt-1">1 hour</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="w-1 h-3 bg-indigo-400 rounded-full"></div>
-                  <span className="text-xs text-gray-600 mt-1">2 hours</span>
-                </div>
-              </div>
+            <div className="flex gap-4 justify-center mt-2">
+              {[30, 60, 120].map((time) => (
+                <button
+                  key={time}
+                  type="button"
+                  className={`flex flex-col items-center justify-center rounded-lg p-3 ${
+                    duration === time 
+                      ? 'bg-indigo-500 text-white' 
+                      : 'bg-gray-200 text-gray-800'
+                  }`}
+                  onClick={() => setDuration(time)}
+                >
+                  <span className="text-lg font-medium">
+                    {time === 30 ? '30' : time === 60 ? '1' : '2'}
+                  </span>
+                  <span className="text-xs mt-1">
+                    {time === 30 ? 'mins' : time === 60 ? 'hour' : 'hours'}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
         );
